@@ -152,7 +152,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Marching Cubes
 	VBMarchCubes* VBMC = new VBMarchCubes();
-	VBMC->init(Vector3(-8.0f, -8.0f, -17.0f), Vector3(8.0f, 8.0f,23.0f), 60.0f*Vector3::One, 0.01, _pd3dDevice);
+	VBMC->init(Vector3(-8.0f, -8.0f, -17.0f) /* Min */, Vector3(8.0f, 8.0f,23.0f) /* Max */, 60.0f*Vector3::One /* size */, 0.01 /* Isolevel */, _pd3dDevice /* GD */);
 	VBMC->SetPos(Vector3(100,0,-100));
 	VBMC->SetPitch(-XM_PIDIV2);
 	VBMC->SetScale(Vector3(3, 3, 1.5));

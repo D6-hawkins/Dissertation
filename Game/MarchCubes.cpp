@@ -47,7 +47,8 @@ will be loaded up with the vertices at most 5 triangular facets.
 0 will be returned if the grid cell is either totally above
 of totally below the isolevel.
 */
-int Polygonise(GRIDCELL grid, float isolevel, TRIANGLE *triangles)
+
+int Polygonise(GRIDCELL grid, double isolevel, TRIANGLE *triangles)
 {
 	int i, ntriang;
 	int cubeindex;
@@ -427,7 +428,7 @@ void VBMarchCubes::init(Vector3 _min, Vector3 _max, Vector3 _size, float _isoLev
 
 void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 _origin, ID3D11Device* _GD)
 {
-	m_scale = Vector3(1.0f / _scale.x, 1.0f / _scale.y, 1.0f / _scale.z);
+	m_scale = Vector3(0.5f / _scale.x, 0.5f / _scale.y, 0.5f / _scale.z);
 	std::vector<myVertex> m_vertices;
 	m_numPrims=0; 
 	TRIANGLE newTriangles[5];
@@ -538,7 +539,7 @@ void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
 	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rasterDesc.FrontCounterClockwise = true;
 	rasterDesc.MultisampleEnable = false;
 	rasterDesc.ScissorEnable = false;
@@ -554,14 +555,10 @@ void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 
 
 }
 
-float VBMarchCubes::function(Vector3 _pos)
+float VBMarchCubes::function(Vector3 _pos) //This function decides the shape of  the object
 {
-	float  z= 0.6f*_pos.z, x = _pos.x,y = _pos.y ;
-
-	return-(cos(x) * sin(y) + cos(y) * sin(z) + cos(z) * sin(x))
-	*(cos(x) * sin(y) + cos(y) * sin(z) + cos(z) * sin(x))
-	+ 0.05f - expf(100.0f*(x*x / 64.0f + y*y / 64.0f + z*z / (1.6f * 64.0f)*expf(-0.4f*z / 8.0f) - 1.0f));
-	//VBMC->init(Vector3(-8.5, -8.5, -17), Vector3(8.5, 8.5,23), Vector3(100, 100, 100), 0.01, _pd3dDevice);
+	float  z= 2.0f *_pos.z,x = 2.0f *_pos.x, y = _pos.y;
+	return (-x * y);
 }
 
 void VBMarchCubes::Tick(GameData* _GD)
