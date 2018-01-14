@@ -11,7 +11,7 @@
 #include "GameData.h"
 #include "drawdata.h"
 #include "DrawData2D.h"
-
+#include "Terrain.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -103,71 +103,29 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_DD->m_cam = m_cam;
 	m_DD->m_light = m_light;
 
-	////add random content to show the various what you've got here
-	//Terrain* terrain = new Terrain("table.cmo", _pd3dDevice, m_fxFactory, Vector3(100.0f, 0.0f, 100.0f), 0.0f, 0.0f, 0.0f, 0.25f * Vector3::One);
-	//m_GameObjects.push_back(terrain);
-
-	////add some stuff to show off
-
-	//FileVBGO* terrainBox = new FileVBGO("../Assets/terrainTex.txt", _pd3dDevice);
-	//m_GameObjects.push_back(terrainBox);
-
-	//FileVBGO* Box = new FileVBGO("../Assets/cube.txt", _pd3dDevice);
-	//m_GameObjects.push_back(Box);
-	//Box->SetPos(Vector3(0.0f, 0.0f, -100.0f));
-	//Box->SetPitch(XM_PIDIV4);
-	//Box->SetScale(20.0f);
-
-	////L-system like tree
-	//m_GameObjects.push_back(new Tree(4, 4, .6f, 10.0f *Vector3::Up, XM_PI/6.0f, "JEMINA vase -up.cmo", _pd3dDevice, m_fxFactory));
-
-	//VBCube* cube = new VBCube();
-	//cube->init(11, _pd3dDevice);
-	//cube->SetPos(Vector3(100.0f, 0.0f, 0.0f));
-	//cube->SetScale(4.0f);
-	//m_GameObjects.push_back(cube);
-
-	//VBSpike* spikes = new VBSpike();
-	//spikes->init(11, _pd3dDevice);
-	//spikes->SetPos(Vector3(0.0f, 0.0f, 100.0f));
-	//spikes->SetScale(4.0f);
-	//m_GameObjects.push_back(spikes);
-
-	//VBSpiral* spiral = new VBSpiral();
-	//spiral->init(11, _pd3dDevice);
-	//spiral->SetPos(Vector3(-100.0f, 0.0f, 0.0f));
-	//spiral->SetScale(4.0f);
-	//m_GameObjects.push_back(spiral);
-
-	//VBPillow* pillow = new VBPillow();
-	//pillow->init(11, _pd3dDevice);
-	//pillow->SetPos(Vector3(-100.0f, 0.0f, -100.0f));
-	//pillow->SetScale(4.0f);
-	//m_GameObjects.push_back(pillow);
-
-	//VBSnail* snail = new VBSnail(_pd3dDevice, "../Assets/baseline.txt", 150, 0.98f, 0.09f * XM_PI, 0.4f, Color(1.0f, 0.0f, 0.0f, 1.0f), Color(0.0f, 0.0f, 1.0f, 1.0f));
-	//snail->SetPos(Vector3(-100.0f, 0.0f, 100.0f));
-	//snail->SetScale(2.0f);
-	//m_GameObjects.push_back(snail);
 
 	//Marching Cubes
-	VBMarchCubes* VBMC = new VBMarchCubes();
-	VBMC->init(Vector3(-8.0f, -8.0f, -17.0f) /* Min */, Vector3(8.0f, 8.0f,23.0f) /* Max */, 60.0f*Vector3::One /* size */, 0.01 /* Isolevel */, _pd3dDevice /* GD */);
-	VBMC->SetPos(Vector3(100,0,-100));
-	VBMC->SetPitch(-XM_PIDIV2);
-	VBMC->SetScale(Vector3(3, 3, 1.5));
-	m_GameObjects.push_back(VBMC);
+	Terrain* Terr = new Terrain();
+	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 0.01, 60.0f*Vector3::One, _pd3dDevice);
+	Terr->SetPos(Vector3(0,0,0));
+	Terr->SetPitch(-XM_PIDIV2);
+	Terr->SetScale(Vector3(3, 3, 1.5));
+	m_GameObjects.push_back(Terr);
 
-
-	////example basic 2D stuff
-	//ImageGO2D* logo = new ImageGO2D("logo_small", _pd3dDevice);
-	//logo->SetPos(200.0f * Vector2::One);
-	//m_GameObject2Ds.push_back(logo);
-
-	//TextGO2D* text = new TextGO2D("Test Text");
-	//text->SetPos(Vector2(100, 10));
-	//text->SetColour(Color((float*)&Colors::Yellow));
-	//m_GameObject2Ds.push_back(text);
+	WaterManager* waterManager = new WaterManager();
+	m_GameObjects.push_back(waterManager);
+	//Terrain* Terr2 = new Terrain();
+	//Terr2->Init(Vector3(10.0f, 10.0f, 13.0f), Vector3(0.0f, 0.0f, 0.0f), 0.01, 60.0f*Vector3::One, _pd3dDevice);
+	//Terr2->SetPos(Vector3(0, 0, 0));
+	//Terr2->SetPitch(XM_PIDIV2);
+	//Terr2->SetScale(Vector3(3, 3, 1.5));
+	//m_GameObjects.push_back(Terr2);
+	//VBMarchCubes* VBMC = new VBMarchCubes();
+	//VBMC->init(Vector3(-8.0f, -8.0f, -17.0f) /* Min */, Vector3(8.0f, 8.0f,23.0f) /* Max */, 60.0f*Vector3::One /* size */, 0.01 /* Isolevel */, _pd3dDevice /* GD */);
+	//VBMC->SetPos(Vector3(100,0,-100));
+	//VBMC->SetPitch(-XM_PIDIV2);
+	//VBMC->SetScale(Vector3(3, 3, 1.5));
+	//m_GameObjects.push_back(VBMC);
 };
 
 
@@ -244,7 +202,7 @@ bool Game::Tick()
 	//lock the cursor to the centre of the window
 	RECT window;
 	GetWindowRect(m_hWnd, &window);
-	SetCursorPos((window.left + window.right) >> 1, (window.bottom + window.top) >> 1);
+	//SetCursorPos((window.left + window.right) >> 1, (window.bottom + window.top) >> 1);
 
 	//calculate frame time-step dt for passing down to game objects
 	DWORD currentTime = GetTickCount();
@@ -289,10 +247,6 @@ void Game::PlayTick()
 	{
 		(*it)->Tick(m_GD);
 	}
-	for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
-	{
-		(*it)->Tick(m_GD);
-	}
 }
 
 void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext) 
@@ -315,15 +269,6 @@ void Game::Draw(ID3D11DeviceContext* _pd3dImmediateContext)
 	{
 		(*it)->Draw(m_DD);
 	}
-
-	// Draw sprite batch stuff 
-	m_DD2D->m_Sprites->Begin();
-	for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
-	{
-		(*it)->Draw(m_DD2D);
-	}
-	m_DD2D->m_Sprites->End();
-
 	//drawing text screws up the Depth Stencil State, this puts it back again!
 	_pd3dImmediateContext->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 };

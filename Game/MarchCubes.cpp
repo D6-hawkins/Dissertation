@@ -430,7 +430,7 @@ void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 
 {
 	m_scale = Vector3(0.5f / _scale.x, 0.5f / _scale.y, 0.5f / _scale.z);
 	std::vector<myVertex> m_vertices;
-	m_numPrims=0; 
+	m_numPrims=0;
 	TRIANGLE newTriangles[5];
 	for (int i = 0; i < _size.x; i++)
 	{
@@ -510,25 +510,6 @@ void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 
 
 	BuildVB(_GD, numVerts, &m_vertices[0]);
 
-	if (false)
-	{
-		//spits out an obj of the model produced
-		std::ofstream output;
-		output.open("test.obj");
-		output << "g TEST\n\n";
-		for (int i = 0; i < numVerts; i++)
-		{
-			output << "v " << m_vertices[i].Pos.x << " " << m_vertices[i].Pos.y << " " << m_vertices[i].Pos.z << "\n";
-		}
-		int count = 0;
-		output << "\n";
-		for (unsigned int i = 0; i < m_numPrims; i++)
-		{
-			output << "f " << 1+indices[count++] << " " << 1 + indices[count++] << " " << 1 + indices[count++] << "\n";
-		}
-		output.close();
-	}
-
 	m_vertices.clear(); //this is no longer needed as this is now in the Vertex Buffer
 	delete indices;
 
@@ -539,7 +520,7 @@ void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
 	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
 	rasterDesc.FrontCounterClockwise = true;
 	rasterDesc.MultisampleEnable = false;
 	rasterDesc.ScissorEnable = false;
@@ -557,8 +538,8 @@ void VBMarchCubes::init(Vector3 _size, float _isolevel, Vector3 _scale, Vector3 
 
 float VBMarchCubes::function(Vector3 _pos) //This function decides the shape of  the object
 {
-	float  z= 2.0f *_pos.z,x = 2.0f *_pos.x, y = _pos.y;
-	return (-x * y);
+	float  z= _pos.z,x = _pos.x, y = _pos.y;
+	return (z,y, z) + +0.05f * expf(/* curviture */360.0f*(x*x / 64.0f /* / number affects length of X*/ + y*y / 64.0f/* / number affects length of y*/ + z*z / (1.6f * 64.0f)*expf(-0.4f*z / 8.0f) - 1.0f));
 }
 
 void VBMarchCubes::Tick(GameData* _GD)

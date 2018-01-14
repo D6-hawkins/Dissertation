@@ -1,23 +1,20 @@
 #ifndef _TERRAIN_H_
 #define _TERRAIN_H_
-#include "CMOGO.h"
+#include "VBGO.h"
 
-//=================================================================
-//Terrian Game Object Class (i.e. an Object that just sits there)
-//=================================================================
 
-struct GameData;
-
-class Terrain : public CMOGO
+class Terrain : public VBGO
 {
 public:
-	Terrain(string _fileName, ID3D11Device* _pd3dDevice, IEffectFactory* _EF, Vector3 _pos, float _pitch, float _yaw, float _roll, Vector3 _scale);
-	~Terrain();
+	Terrain() {};
+	virtual ~Terrain() {};
 
-	void Tick(GameData* _GD) override {} ;
-
+	void Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device* _GD);
+	void Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device* _GD);
+	void Tick(GameData* _GD) override;
 protected:
-
+	float PosChanger(Vector3 _pos, int i);
+	Vector3 m_origin;
 };
 
 #endif

@@ -21,7 +21,7 @@
 #define DESTROY( x ) if( x ){ x->Release(); x = nullptr;}
 
 //--------------------------------------------------------------------------------------
-// Forward Deceleration of Window Procedure
+// Forward Declaration of Window Procedure
 //--------------------------------------------------------------------------------------
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -80,7 +80,7 @@ HRESULT Application::InitWindow( HINSTANCE _hInstance, int _nCmdShow )
     ShowWindow( m_hWnd, _nCmdShow );
 
 	//Hide the mouse pointer
-	ShowCursor(false);
+	ShowCursor(true);
 	
     return S_OK;
 }

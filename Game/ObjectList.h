@@ -9,18 +9,4 @@
 #include "TPSCamera.h"
 #include "Player.h"
 #include "Terrain.h"
-#include "Tree.h"
-
-//VBGO examples
-#include "VBCube.h"
-#include "VBPillow.h"
-#include "VBSpiked.h"
-#include "VBspiral.h"
-#include "VBSnail.h"
-#include "fileVBGO.h"
-#include "MarchCubes.h"
-
-//and 2-D ones here
-#include "GameObject2D.h"
-#include "ImageGO2D.h"
-#include "TextGO2D.h"
+#include "WaterManager.h"

@@ -21,6 +21,7 @@ public:
 	void Tick(GameData* _GD) override;
 
 protected:
+	float counter = 0.5f;
 	float function(Vector3 _pos);
 };
 
