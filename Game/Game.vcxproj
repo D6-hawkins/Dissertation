@@ -130,6 +130,7 @@
     <ClInclude Include="GameData.h" />
     <ClInclude Include="gameobject.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="gridcell.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="MarchCubes.h" />

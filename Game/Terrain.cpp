@@ -1,17 +1,14 @@
 #include "Terrain.h"
 #include "vertex.h"
-#include <vector>
-#include <fstream>
-#include <math.h>
 //Marching Cube Algorithm: http://paulbourke.net/geometry/polygonise/
 typedef Vector3 XYZ;
 typedef struct {
 	XYZ p[3];
 } TRIANGLE;
-typedef struct {
-	XYZ p[8];
-	double val[8];
-} GRIDCELL;
+//typedef struct {
+//	XYZ p[8];
+//	double val[8];
+//} GRIDCELL;
 /*
 Linearly interpolate the position where an isosurface cuts
 an edge between two vertices, each with their own scalar value
@@ -420,7 +417,8 @@ void Terrain::Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, I
 void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device * _GD)
 {
 	m_origin = _origin;
-	std::vector<myVertex> m_vertices;
+	m_scale = _scale;
+	m_size = _size;
 	m_numPrims = 0;
 	TRIANGLE m_Triangles[5];
 		for (int XCounter = 0; XCounter < _size.x; XCounter++)
@@ -429,7 +427,6 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 			{
 				for (int ZCounter = 0; ZCounter < _size.z; ZCounter++)
 				{
-					GRIDCELL m_Grid;
 					for (int i = 0; i < 8; i++)
 					{
 						m_Grid.p[i] = (Vector3(XCounter, YCounter, ZCounter) + corners[i]) * _scale + m_origin;
@@ -477,7 +474,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	{
 		indices[i] = i;
 		m_vertices[i].texCoord = Vector2::One;
-		m_vertices[i].Color = Color(1.0, 0.0, 0.0, 1.0);
+		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
 	}
 
 	BuildIB(_GD, indices);
@@ -507,7 +504,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	raster.DepthBias = 0;
 	raster.DepthBiasClamp = 0.0f;
 	raster.DepthClipEnable = true;
-	raster.FillMode = D3D11_FILL_SOLID;
+	raster.FillMode = D3D11_FILL_WIREFRAME;
 	raster.FrontCounterClockwise = true;
 	raster.MultisampleEnable = false;
 	raster.ScissorEnable = false;
@@ -531,6 +528,6 @@ void Terrain::Tick(GameData * _GD)
 
 float Terrain::PosChanger(Vector3 _pos, int i)
 {
-	float  z = 0.6f*_pos.z, x = 0.6f* _pos.x, y = 0.6f* _pos.y;
-	return (sin(x*35) * sin(y*35) * sin(z*35));
+	float  z = 0.2f*_pos.z, x = 0.2f* _pos.x, y = 0.2f* _pos.y;
+	return (sin(x * 35) * sin(y*35) * sin(z*35));
 }

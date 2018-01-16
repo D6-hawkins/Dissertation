@@ -99,6 +99,9 @@
     <ClInclude Include="WaterManager.h">
       <Filter>Objects\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="gridcell.h">
+      <Filter>Base\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">

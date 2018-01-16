@@ -1,24 +1,38 @@
 #include "Water.h"
 
-void Water::init(Vector3 _pos, GameData * _GD)
+Water::Water(string _fileName, ID3D11Device * _pd3dDevice, IEffectFactory * _EF) : CMOGO(_fileName, _pd3dDevice, _EF)
 {
-	//need to give them a body - need to find if they're getting drawn properly (probably not)
-	SetPos(_pos);
+	Vector3 tempPos = Vector3(0.0f, 35.0f, 0.0f);
+	SetPos(tempPos);
+}
+
+void Water::init(Vector3 _pos, ID3D11Device * GD)
+{
+	//Vector3 tempPos = Vector3(10.0f, 40.0f, -10.0f);
+	//SetPos(tempPos);
 	isAlive = true;
+	bool grounded = false;
+	SetPhysicsOn(true);
 }
 
 void Water::Tick(GameData * _GD) //Physics will happen in tick
 {
+	fallSpeed = 50.0f * _GD->m_dt;
 	if (isAlive == true)
 	{
-		//Velocity track - higher velocity, less absorbtion
-
-		//Absorbtion track - less water = slower velocity (maybe)
-
-		//Direction track - need to calculate the correct direction to move
-
-		//Collision track - for collision (need to set up collision for marching cubes)
-
-		//Look into applying boid physics to water - Joining together when getting close, increasing mass and stuff
+		if (grounded == false)
+		{
+			m_acc.y -= fallSpeed;
+		}
+		if (grounded == true)
+		{
+			m_acc = Vector3(0.0f, 0.0f, 0.0f);
+		}
 	}
+	CMOGO::Tick(_GD);
+}
+
+float Water::getErode()
+{
+	return erodeVal;
 }

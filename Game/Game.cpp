@@ -106,13 +106,15 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Marching Cubes
 	Terrain* Terr = new Terrain();
-	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 0.01, 60.0f*Vector3::One, _pd3dDevice);
+	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 0.01, 40.0f*Vector3::One, _pd3dDevice);
 	Terr->SetPos(Vector3(0,0,0));
 	Terr->SetPitch(-XM_PIDIV2);
-	Terr->SetScale(Vector3(3, 3, 1.5));
+	Terr->SetScale(Vector3(3, 3, 3));
 	m_GameObjects.push_back(Terr);
 
 	WaterManager* waterManager = new WaterManager();
+	waterManager->Init(Terr, "BirdModelV1.cmo", _pd3dDevice, m_fxFactory);
+	waterManager->setDevice(_pd3dDevice);
 	m_GameObjects.push_back(waterManager);
 	//Terrain* Terr2 = new Terrain();
 	//Terr2->Init(Vector3(10.0f, 10.0f, 13.0f), Vector3(0.0f, 0.0f, 0.0f), 0.01, 60.0f*Vector3::One, _pd3dDevice);
@@ -202,6 +204,10 @@ bool Game::Tick()
 	//lock the cursor to the centre of the window
 	RECT window;
 	GetWindowRect(m_hWnd, &window);
+	POINT cursor;
+	GetCursorPos(&cursor);
+	m_GD->m_mouseState->lX = (window.left+window.right) + cursor.x;
+	m_GD->m_mouseState->lY = (window.bottom+window.top) + cursor.y;
 	//SetCursorPos((window.left + window.right) >> 1, (window.bottom + window.top) >> 1);
 
 	//calculate frame time-step dt for passing down to game objects
