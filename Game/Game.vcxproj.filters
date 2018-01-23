@@ -25,15 +25,6 @@
     <Filter Include="Objects\Source">
       <UniqueIdentifier>{8e1bc308-fc3e-45d3-ac6e-5f8b8bcbd64f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Objects\Example VBGOs">
-      <UniqueIdentifier>{45c8dfd0-3f6c-4ed0-a8b0-57c14d11cfa6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Objects\Example VBGOs\Headers">
-      <UniqueIdentifier>{1298ca80-307e-4f26-8364-51807f7283e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Objects\Example VBGOs\Source">
-      <UniqueIdentifier>{805de39c-33ae-4689-979d-f6e8d6dcff47}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -84,9 +75,6 @@
     <ClInclude Include="TPSCamera.h">
       <Filter>Objects\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="MarchCubes.h">
-      <Filter>Objects\Example VBGOs\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Terrain.h">
       <Filter>Objects\Headers</Filter>
     </ClInclude>
@@ -101,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="gridcell.h">
       <Filter>Base\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Voxel.h">
+      <Filter>Objects\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -128,9 +119,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>Objects\Source</Filter>
     </ClCompile>
-    <ClCompile Include="MarchCubes.cpp">
-      <Filter>Objects\Example VBGOs\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Terrain.cpp">
       <Filter>Objects\Source</Filter>
     </ClCompile>
@@ -141,6 +129,9 @@
       <Filter>Objects\Source</Filter>
     </ClCompile>
     <ClCompile Include="WaterManager.cpp">
+      <Filter>Objects\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Voxel.cpp">
       <Filter>Objects\Source</Filter>
     </ClCompile>
   </ItemGroup>

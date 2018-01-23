@@ -1,10 +1,11 @@
 #include "Terrain.h"
 #include "vertex.h"
+#include "Voxel.h"
 //Marching Cube Algorithm: http://paulbourke.net/geometry/polygonise/
-typedef Vector3 XYZ;
-typedef struct {
-	XYZ p[3];
-} TRIANGLE;
+//typedef Vector3 XYZ;
+//typedef struct {
+//	XYZ p[3];
+//} TRIANGLE;
 //typedef struct {
 //	XYZ p[8];
 //	double val[8];
@@ -357,40 +358,40 @@ int Polygonise(GRIDCELL grid, double isolevel, TRIANGLE *triangles)
 	/* Find the vertices where the surface intersects the cube */
 	if (edgeTable[cubeindex] & 1)
 		vertlist[0] =
-		VertexInterp(isolevel, grid.p[0], grid.p[1], grid.val[0], grid.val[1]);
+		VertexInterp(isolevel, grid.p[0]->GetPos(), grid.p[1]->GetPos(), grid.val[0], grid.val[1]);
 	if (edgeTable[cubeindex] & 2)
 		vertlist[1] =
-		VertexInterp(isolevel, grid.p[1], grid.p[2], grid.val[1], grid.val[2]);
+		VertexInterp(isolevel, grid.p[1]->GetPos(), grid.p[2]->GetPos(), grid.val[1], grid.val[2]);
 	if (edgeTable[cubeindex] & 4)
 		vertlist[2] =
-		VertexInterp(isolevel, grid.p[2], grid.p[3], grid.val[2], grid.val[3]);
+		VertexInterp(isolevel, grid.p[2]->GetPos(), grid.p[3]->GetPos(), grid.val[2], grid.val[3]);
 	if (edgeTable[cubeindex] & 8)
 		vertlist[3] =
-		VertexInterp(isolevel, grid.p[3], grid.p[0], grid.val[3], grid.val[0]);
+		VertexInterp(isolevel, grid.p[3]->GetPos(), grid.p[0]->GetPos(), grid.val[3], grid.val[0]);
 	if (edgeTable[cubeindex] & 16)
 		vertlist[4] =
-		VertexInterp(isolevel, grid.p[4], grid.p[5], grid.val[4], grid.val[5]);
+		VertexInterp(isolevel, grid.p[4]->GetPos(), grid.p[5]->GetPos(), grid.val[4], grid.val[5]);
 	if (edgeTable[cubeindex] & 32)
 		vertlist[5] =
-		VertexInterp(isolevel, grid.p[5], grid.p[6], grid.val[5], grid.val[6]);
+		VertexInterp(isolevel, grid.p[5]->GetPos(), grid.p[6]->GetPos(), grid.val[5], grid.val[6]);
 	if (edgeTable[cubeindex] & 64)
 		vertlist[6] =
-		VertexInterp(isolevel, grid.p[6], grid.p[7], grid.val[6], grid.val[7]);
+		VertexInterp(isolevel, grid.p[6]->GetPos(), grid.p[7]->GetPos(), grid.val[6], grid.val[7]);
 	if (edgeTable[cubeindex] & 128)
 		vertlist[7] =
-		VertexInterp(isolevel, grid.p[7], grid.p[4], grid.val[7], grid.val[4]);
+		VertexInterp(isolevel, grid.p[7]->GetPos(), grid.p[4]->GetPos(), grid.val[7], grid.val[4]);
 	if (edgeTable[cubeindex] & 256)
 		vertlist[8] =
-		VertexInterp(isolevel, grid.p[0], grid.p[4], grid.val[0], grid.val[4]);
+		VertexInterp(isolevel, grid.p[0]->GetPos(), grid.p[4]->GetPos(), grid.val[0], grid.val[4]);
 	if (edgeTable[cubeindex] & 512)
 		vertlist[9] =
-		VertexInterp(isolevel, grid.p[1], grid.p[5], grid.val[1], grid.val[5]);
+		VertexInterp(isolevel, grid.p[1]->GetPos(), grid.p[5]->GetPos(), grid.val[1], grid.val[5]);
 	if (edgeTable[cubeindex] & 1024)
 		vertlist[10] =
-		VertexInterp(isolevel, grid.p[2], grid.p[6], grid.val[2], grid.val[6]);
+		VertexInterp(isolevel, grid.p[2]->GetPos(), grid.p[6]->GetPos(), grid.val[2], grid.val[6]);
 	if (edgeTable[cubeindex] & 2048)
 		vertlist[11] =
-		VertexInterp(isolevel, grid.p[3], grid.p[7], grid.val[3], grid.val[7]);
+		VertexInterp(isolevel, grid.p[3]->GetPos(), grid.p[7]->GetPos(), grid.val[3], grid.val[7]);
 
 	/* Create the triangle */
 	ntriang = 0;
@@ -410,9 +411,11 @@ Vector3 corners[8]
 };
 void Terrain::Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device * _GD)
 {
+	SetPhysicsOn(true);
 	Vector3 origin = _min;
 	Vector3 scale = (_max - _min) / _size;
 	Init(_isolevel,origin,_size , scale,_GD);
+	dev = _GD;
 }
 void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device * _GD)
 {
@@ -420,7 +423,8 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_scale = _scale;
 	m_size = _size;
 	m_numPrims = 0;
-	TRIANGLE m_Triangles[5];
+	m_isolevel = isolevel;
+	//TRIANGLE m_Triangles[5];
 		for (int XCounter = 0; XCounter < _size.x; XCounter++)
 		{
 			for (int YCounter = 0; YCounter < _size.y; YCounter++)
@@ -429,12 +433,14 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 				{
 					for (int i = 0; i < 8; i++)
 					{
-						m_Grid.p[i] = (Vector3(XCounter, YCounter, ZCounter) + corners[i]) * _scale + m_origin;
-						m_Grid.val[i] = PosChanger(m_Grid.p[i], i);
+						m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
+						m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
+						//m_Grid.size = 7;
 					}
+					gridVec.push_back(m_Grid);
 					int newTris = Polygonise(m_Grid, isolevel, &m_Triangles[0]);
 					m_numPrims += newTris;
-					for (int Counter = 0; Counter < newTris; Counter++)
+					for (int Counter = 0; Counter < newTris; Counter++)   
 					{
 						for (int m = 0; m < 3; m++)
 						{
@@ -457,7 +463,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 
 		//build normals
 		Vector3 norm;
-		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
+		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos; 
 		Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
 		norm = vec1.Cross(vec2);
 		norm.Normalize();
@@ -480,9 +486,9 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	BuildIB(_GD, indices);
 
 	//structures from creating buffers
-	D3D11_BUFFER_DESC bd;
-	D3D11_SUBRESOURCE_DATA InitData;
-	HRESULT hr = S_OK;
+	//D3D11_BUFFER_DESC bd;
+	//D3D11_SUBRESOURCE_DATA InitData;
+	//HRESULT hr = S_OK;
 
 	//build index buffer
 	ZeroMemory(&bd, sizeof(bd));
@@ -494,7 +500,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	hr = _GD->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
 
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
-
+	if (numVerts != 0)
 	BuildVB(_GD, numVerts, &m_vertices[0]);
 
 	//Rasterizer
@@ -504,7 +510,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	raster.DepthBias = 0;
 	raster.DepthBiasClamp = 0.0f;
 	raster.DepthClipEnable = true;
-	raster.FillMode = D3D11_FILL_WIREFRAME;
+	raster.FillMode = D3D11_FILL_SOLID;
 	raster.FrontCounterClockwise = true;
 	raster.MultisampleEnable = false;
 	raster.ScissorEnable = false;
@@ -523,11 +529,76 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 
 void Terrain::Tick(GameData * _GD)
 {
+	m_numPrims = 0;
+	m_vertices.clear();
+	for (int i = 0; i < gridVec.size(); i++)
+	{
+		for (int r = 0; r < 8; r++)
+		{
+			gridVec[i].p[r]->Tick(_GD);
+		}
+		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
+		m_numPrims += newTris;
+		for (int Counter = 0; Counter < newTris; Counter++)
+		{
+			for (int m = 0; m < 3; m++)
+			{
+				myVertex newVert;
+				newVert.Pos = m_Triangles[Counter].p[m];
+				m_vertices.push_back(newVert);
+			}
+		}
+	}
+	int numVerts = m_numPrims * 3;
+	for (unsigned int i = 0; i<m_numPrims; i++)
+	{
+		int V1 = 3 * i;
+		int V2 = 3 * i + 1;
+		int V3 = 3 * i + 2;
+
+		//build normals
+		Vector3 norm;
+		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
+		Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
+		norm = vec1.Cross(vec2);
+		norm.Normalize();
+
+		m_vertices[V1].Norm = norm;
+		m_vertices[V2].Norm = norm;
+		m_vertices[V3].Norm = norm;
+	}
+	int* indices = new int[numVerts];
+	//as using the standard VB shader set the tex-coords somewhere safe
+	for (int i = 0; i<numVerts; i++)
+	{
+		indices[i] = i;
+		m_vertices[i].texCoord = Vector2::One;
+		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
+	}
+
+	BuildIB(dev, indices);
+
+	//Buffer creation is shared with Init function
+	bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
+	InitData.pSysMem = indices;
+	hr = dev->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
+
+	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
+	if (numVerts != 0)
+	BuildVB(dev, numVerts, &m_vertices[0]);
 	VBGO::Tick(_GD);
+}
+
+void Terrain::Remake()
+{
+
 }
 
 float Terrain::PosChanger(Vector3 _pos, int i)
 {
-	float  z = 0.2f*_pos.z, x = 0.2f* _pos.x, y = 0.2f* _pos.y;
-	return (sin(x * 35) * sin(y*35) * sin(z*35));
+	//float  z = 0.2f*_pos->GetPos().z, x = 0.2f* _pos->GetPos().x, y = 0.2f* _pos->GetPos().y;
+	//return (sin(x * 35) * sin(y*35) * sin(z*35));
+	float z = _pos.z;
+	//float z = _pos->GetPos().z;
+	return z;
 }

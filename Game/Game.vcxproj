@@ -133,7 +133,6 @@
     <ClInclude Include="gridcell.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="MarchCubes.h" />
     <ClInclude Include="ObjectList.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Terrain.h" />
@@ -141,6 +140,7 @@
     <ClInclude Include="TPSCamera.h" />
     <ClInclude Include="VBGO.h" />
     <ClInclude Include="vertex.h" />
+    <ClInclude Include="Voxel.h" />
     <ClInclude Include="Water.h" />
     <ClInclude Include="WaterManager.h" />
   </ItemGroup>
@@ -150,12 +150,12 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="light.cpp" />
-    <ClCompile Include="MarchCubes.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainManager.cpp" />
     <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="VBGO.cpp" />
+    <ClCompile Include="Voxel.cpp" />
     <ClCompile Include="Water.cpp" />
     <ClCompile Include="WaterManager.cpp" />
   </ItemGroup>
