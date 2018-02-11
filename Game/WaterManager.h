@@ -5,12 +5,13 @@
 #include <vector>
 class Water;
 class Terrain;
+class Camera;
 class WaterManager : public VBGO
 {
 public:
 	WaterManager() {};
 	virtual ~WaterManager() {};
-	void Init(Terrain* Terr, string model, ID3D11Device*_pd3dDevice, IEffectFactory* m_fxFactory);
+	void Init(Terrain* Terr, string model, ID3D11Device*_pd3dDevice, IEffectFactory* m_fxFactory, Camera* m_Cam);
 
 
 	virtual void Tick(GameData* _GD) override;
@@ -24,5 +25,6 @@ private:
 	float currentTime = 0.1f;
 	ID3D11Device* GD;
 	Terrain* terrStore;
+	Camera* m_camStore;
 };
 #endif // ! _WATER_MANAGER_H_

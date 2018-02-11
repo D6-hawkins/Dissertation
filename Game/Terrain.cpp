@@ -424,7 +424,6 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_size = _size;
 	m_numPrims = 0;
 	m_isolevel = isolevel;
-	//TRIANGLE m_Triangles[5];
 		for (int XCounter = 0; XCounter < _size.x; XCounter++)
 		{
 			for (int YCounter = 0; YCounter < _size.y; YCounter++)
@@ -435,7 +434,21 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 					{
 						m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
 						m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
-						//m_Grid.size = 7;
+						m_Grid.size = 7;
+					}
+					for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+					{
+						for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+						{
+							for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+							{
+								if (m_Grid.p[GridC]->GetPos() == gridVec[vecC].p[innerVecC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+								{
+									m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
+									m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
+								}
+							}
+						}
 					}
 					gridVec.push_back(m_Grid);
 					int newTris = Polygonise(m_Grid, isolevel, &m_Triangles[0]);
@@ -463,7 +476,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 
 		//build normals
 		Vector3 norm;
-		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos; 
+		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
 		Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
 		norm = vec1.Cross(vec2);
 		norm.Normalize();
@@ -533,10 +546,6 @@ void Terrain::Tick(GameData * _GD)
 	m_vertices.clear();
 	for (int i = 0; i < gridVec.size(); i++)
 	{
-		for (int r = 0; r < 8; r++)
-		{
-			gridVec[i].p[r]->Tick(_GD);
-		}
 		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
 		m_numPrims += newTris;
 		for (int Counter = 0; Counter < newTris; Counter++)
@@ -586,6 +595,17 @@ void Terrain::Tick(GameData * _GD)
 	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	if (numVerts != 0)
 	BuildVB(dev, numVerts, &m_vertices[0]);
+	if (counter != 300)
+	{
+		for (int i = 0; i < gridVec.size(); i++)
+		{
+			for (int r = 0; r < 8; r++)
+			{
+				gridVec[i].p[r]->Tick(_GD);
+			}
+		}
+		counter++;
+	}
 	VBGO::Tick(_GD);
 }
 
@@ -594,9 +614,13 @@ void Terrain::Remake()
 
 }
 
+//void Terrain::seamlessMesh(GRIDCELL)
+//{
+//}
+
 float Terrain::PosChanger(Vector3 _pos, int i)
 {
-	//float  z = 0.2f*_pos->GetPos().z, x = 0.2f* _pos->GetPos().x, y = 0.2f* _pos->GetPos().y;
+	//float  z = 0.2f*_pos.z, x = 0.2f* _pos.x, y = 0.2f* _pos.y;
 	//return (sin(x * 35) * sin(y*35) * sin(z*35));
 	float z = _pos.z;
 	//float z = _pos->GetPos().z;

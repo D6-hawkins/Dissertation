@@ -13,6 +13,7 @@ typedef Vector3 XYZ;
 typedef struct {
 	Voxel* p[8];
 	double val[8];
+	int size;
 } GRIDCELL;
 
 

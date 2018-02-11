@@ -113,7 +113,7 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	m_GameObjects.push_back(Terr);
 
 	WaterManager* waterManager = new WaterManager();
-	waterManager->Init(Terr, "BirdModelV1.cmo", _pd3dDevice, m_fxFactory);
+	waterManager->Init(Terr, "BirdModelV1.cmo", _pd3dDevice, m_fxFactory, m_TPScam);
 	waterManager->setDevice(_pd3dDevice);
 	m_GameObjects.push_back(waterManager);
 	//Terrain* Terr2 = new Terrain();

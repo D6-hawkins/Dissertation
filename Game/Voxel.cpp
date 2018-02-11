@@ -9,22 +9,22 @@ Voxel::Voxel(Vector3 _pos)
 
 void Voxel::Tick(GameData * _GD)
 {
-	//float z = GetPos().z;
-	//float y = GetPos().y;
-	//float x = GetPos().x;
-	//int randNum = rand() % 6 + 1;
-	//switch (randNum) 
-	//{
-	//	/*case 1: z -= 0.02f;
-	//	case 2: z += 0.02f;*/
-	//	case 3: y -= 0.04f;
-	//	case 4: y += 0.04f;
-	//	case 5: x -= 0.04f;
-	//	case 6: x += 0.04f;
+	float z = GetPos().z;
+	float y = GetPos().y;
+	float x = GetPos().x;
+	int randNum = rand() % 2 + 1;
+	switch (randNum) 
+	{
+	case 1: z -= 0.02f; break;
+	case 2: z += 0.02f; break;
+	//case 3: y -= 0.04f; break;
+	//case 4: y += 0.04f; break;
+	//case 5: x -= 0.04f; break;
+	//case 6: x += 0.04f; break;
 
-	//}
-	//Vector3 pos = Vector3(x, y, z);
-	//SetPos(pos);
+	}
+	Vector3 pos = Vector3(x, y, z);
+	SetPos(pos);
 
 
 	//Matrix  scaleMat = Matrix::CreateScale(m_scale);

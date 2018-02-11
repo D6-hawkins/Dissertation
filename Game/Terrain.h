@@ -25,6 +25,7 @@ public:
 	Vector3 getScale() { return m_scale; };
 	Vector3 getSize() { return m_size; };
 	std::vector<myVertex> getvert() { return m_vertices; };
+	void seamlessMesh();
 protected:
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
@@ -40,6 +41,7 @@ protected:
 	D3D11_BUFFER_DESC bd;
 	D3D11_SUBRESOURCE_DATA InitData;
 	HRESULT hr = S_OK;
+	int counter = 0;
 };
 
 #endif
