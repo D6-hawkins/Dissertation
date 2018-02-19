@@ -22,6 +22,7 @@ public:
 	void Tick(GameData* _GD) override;
 	void Remake();
 	GRIDCELL getGrid() { return m_Grid; };
+	std::vector<GRIDCELL> getGridVec() { return gridVec; };
 	Vector3 getScale() { return m_scale; };
 	Vector3 getSize() { return m_size; };
 	std::vector<myVertex> getvert() { return m_vertices; };

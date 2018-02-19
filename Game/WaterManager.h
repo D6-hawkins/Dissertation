@@ -3,6 +3,7 @@
 #include "VBGO.h"
 #include "CMOGO.h"
 #include <vector>
+#include "gridcell.h"
 class Water;
 class Terrain;
 class Camera;
@@ -11,7 +12,7 @@ class WaterManager : public VBGO
 public:
 	WaterManager() {};
 	virtual ~WaterManager() {};
-	void Init(Terrain* Terr, string model, ID3D11Device*_pd3dDevice, IEffectFactory* m_fxFactory, Camera* m_Cam);
+	void Init(std::vector <GRIDCELL> Terr, string model, ID3D11Device*_pd3dDevice, IEffectFactory* m_fxFactory, Camera* m_Cam);
 
 
 	virtual void Tick(GameData* _GD) override;
@@ -26,5 +27,6 @@ private:
 	ID3D11Device* GD;
 	Terrain* terrStore;
 	Camera* m_camStore;
+	std::vector <GRIDCELL> gridVecStore;
 };
 #endif // ! _WATER_MANAGER_H_

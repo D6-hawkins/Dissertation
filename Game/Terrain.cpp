@@ -451,7 +451,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 						}
 					}
 					gridVec.push_back(m_Grid);
-					int newTris = Polygonise(m_Grid, isolevel, &m_Triangles[0]);
+					/*int newTris = Polygonise(m_Grid, isolevel, &m_Triangles[0]);
 					m_numPrims += newTris;
 					for (int Counter = 0; Counter < newTris; Counter++)   
 					{
@@ -461,30 +461,30 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 							newVert.Pos = m_Triangles[Counter].p[m];
 							m_vertices.push_back(newVert);
 						}
-					}
+					}*/
 				}
 			}
 		}
 	int numVerts = m_numPrims * 3;
 
-	//calculate the normals for the basic lighting in the base shader
-	for (unsigned int i = 0; i<m_numPrims; i++)
-	{
-		int V1 = 3 * i;
-		int V2 = 3 * i + 1;
-		int V3 = 3 * i + 2;
+	////calculate the normals for the basic lighting in the base shader
+	//for (unsigned int i = 0; i<m_numPrims; i++)
+	//{
+	//	int V1 = 3 * i;
+	//	int V2 = 3 * i + 1;
+	//	int V3 = 3 * i + 2;
 
-		//build normals
-		Vector3 norm;
-		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
-		Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
-		norm = vec1.Cross(vec2);
-		norm.Normalize();
+	//	//build normals
+	//	Vector3 norm;
+	//	Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
+	//	Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
+	//	norm = vec1.Cross(vec2);
+	//	norm.Normalize();
 
-		m_vertices[V1].Norm = norm;
-		m_vertices[V2].Norm = norm;
-		m_vertices[V3].Norm = norm;
-	}
+	//	m_vertices[V1].Norm = norm;
+	//	m_vertices[V2].Norm = norm;
+	//	m_vertices[V3].Norm = norm;
+	//}
 
 	int* indices = new int[numVerts];
 
@@ -586,7 +586,6 @@ void Terrain::Tick(GameData * _GD)
 	}
 
 	BuildIB(dev, indices);
-
 	//Buffer creation is shared with Init function
 	bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
 	InitData.pSysMem = indices;

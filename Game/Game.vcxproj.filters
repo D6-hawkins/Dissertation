@@ -78,9 +78,6 @@
     <ClInclude Include="Terrain.h">
       <Filter>Objects\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="TerrainManager.h">
-      <Filter>Objects\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Water.h">
       <Filter>Objects\Headers</Filter>
     </ClInclude>
@@ -120,9 +117,6 @@
       <Filter>Objects\Source</Filter>
     </ClCompile>
     <ClCompile Include="Terrain.cpp">
-      <Filter>Objects\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="TerrainManager.cpp">
       <Filter>Objects\Source</Filter>
     </ClCompile>
     <ClCompile Include="Water.cpp">

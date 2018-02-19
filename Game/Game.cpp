@@ -106,14 +106,14 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Marching Cubes
 	Terrain* Terr = new Terrain();
-	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 5, 10.0f*Vector3::One, _pd3dDevice);
+	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
 	Terr->SetPos(Vector3(0,0,0));
 	Terr->SetPitch(-XM_PIDIV2);
 	Terr->SetScale(Vector3(3, 3, 3));
 	m_GameObjects.push_back(Terr);
 
 	WaterManager* waterManager = new WaterManager();
-	waterManager->Init(Terr, "BirdModelV1.cmo", _pd3dDevice, m_fxFactory, m_TPScam);
+	waterManager->Init(Terr->getGridVec(), "BirdModelV1.cmo", _pd3dDevice, m_fxFactory, m_TPScam);
 	waterManager->setDevice(_pd3dDevice);
 	m_GameObjects.push_back(waterManager);
 	//Terrain* Terr2 = new Terrain();
