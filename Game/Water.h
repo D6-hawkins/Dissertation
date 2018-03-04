@@ -1,12 +1,12 @@
 #ifndef _WATER_H_
 #define _WATER_
-#include "CMOGO.h"
+#include "VBGO.h"
 #include "vertex.h"
 #include "GameData.h"
-class Water : public CMOGO
+class Water : public VBGO
 {
 public:
-	Water(string _fileName, ID3D11Device* _pd3dDevice, IEffectFactory* _EF);
+	Water();
 	virtual ~Water() {};
 	void init(Vector3 _pos, ID3D11Device* _GD);
 

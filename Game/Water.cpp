@@ -1,6 +1,6 @@
 #include "Water.h"
 
-Water::Water(string _fileName, ID3D11Device * _pd3dDevice, IEffectFactory * _EF) : CMOGO(_fileName, _pd3dDevice, _EF)
+Water::Water()
 {
 	//Vector3 tempPos = Vector3(0.0f, 60.0f, 0.0f);
 	//SetPos(tempPos);
@@ -8,11 +8,12 @@ Water::Water(string _fileName, ID3D11Device * _pd3dDevice, IEffectFactory * _EF)
 
 void Water::init(Vector3 _pos, ID3D11Device * GD)
 {
-	//Vector3 tempPos = Vector3(10.0f, 40.0f, -10.0f);
-	SetPos(_pos);
-	isAlive = true;
-	//bool grounded = false;
-	SetPhysicsOn(true);
+	////Vector3 tempPos = Vector3(10.0f, 40.0f, -10.0f);
+	//SetPos(_pos);
+	//isAlive = true;
+	////bool grounded = false;
+	//SetPhysicsOn(true);
+
 }
 
 void Water::Tick(GameData * _GD) //Physics will happen in tick
@@ -29,7 +30,7 @@ void Water::Tick(GameData * _GD) //Physics will happen in tick
 			m_vel.y = 0;
 		}
 	}
-	CMOGO::Tick(_GD);
+	VBGO::Tick(_GD);
 }
 
 float Water::getErode()

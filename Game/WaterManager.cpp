@@ -23,7 +23,7 @@ void WaterManager::Tick(GameData * _GD)
 		Vector3 MousePos = Vector3(10,30,-20); //= Vector3(_GD->m_mouseState->lX, _GD->m_mouseState->lY, _GD->m_mouseState->lZ);
 		//Vector3 worldPos;
 		//worldPos.Transform(Vector3(_GD->m_mouseState->lX, _GD->m_mouseState->lY, _GD->m_mouseState->lZ), m_camStore->GetView());
-		Water* water = new Water(modelStore, GD, _effect);
+		Water* water = new Water();
 		water->init(MousePos, GD);
 		waterVec.push_back(water);
 	}
