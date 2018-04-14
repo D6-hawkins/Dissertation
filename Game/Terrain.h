@@ -6,6 +6,7 @@
 #include <fstream>
 #include <math.h>
 #include "vertex.h"
+#include "DrawData.h"
 class Voxel;
 typedef Vector3 XYZ;
 typedef struct {
@@ -20,6 +21,7 @@ public:
 	void Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device* _GD);
 	void Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device* _GD);
 	void Tick(GameData* _GD) override;
+	//void Draw(DrawData* _DD) override;
 	void Remake();
 	GRIDCELL getGrid() { return m_Grid; };
 	std::vector<GRIDCELL> getGridVec() { return gridVec; };

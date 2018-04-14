@@ -436,13 +436,29 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 						m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
 						m_Grid.size = 7;
 					}
-					for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+					//METHOD 1
+					//for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+					//{
+					//	for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+					//	{
+					//		for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+					//		{
+					//			if (m_Grid.p[GridC]->GetPos() == gridVec[vecC].p[innerVecC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+					//			{
+					//				m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
+					//				m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
+					//			}
+					//		}
+					//	}
+					//}
+					////METHOD 3
+					for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
 					{
-						for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+						for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
 						{
-							for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+							for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
 							{
-								if (m_Grid.p[GridC]->GetPos() == gridVec[vecC].p[innerVecC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+								if (gridVec[vecC].p[innerVecC]->GetPos() == m_Grid.p[GridC]->GetPos()) //If any of the positions of the new grid positions match existing positions
 								{
 									m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
 									m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
@@ -451,20 +467,49 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 						}
 					}
 					gridVec.push_back(m_Grid);
-					/*int newTris = Polygonise(m_Grid, isolevel, &m_Triangles[0]);
-					m_numPrims += newTris;
-					for (int Counter = 0; Counter < newTris; Counter++)   
-					{
-						for (int m = 0; m < 3; m++)
-						{
-							myVertex newVert;
-							newVert.Pos = m_Triangles[Counter].p[m];
-							m_vertices.push_back(newVert);
-						}
-					}*/
 				}
 			}
 		}
+		//METHOD 2
+		//for (int VecCounter = 0; VecCounter < gridVec.size(); VecCounter++)
+		//{
+		//	for (int VecCounterB = 0; VecCounterB < gridVec.size(); VecCounterB++)
+		//	{
+		//		for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
+		//		{
+		//			for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
+		//			{
+		//				if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+		//				{
+		//					gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
+		//					gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
+		//METHOD 4
+		//for (int VecCounter = 0; VecCounter < gridVec.size(); VecCounter++)
+		//{
+		//	for (int VecCounterB = 0; VecCounterB < gridVec.size(); VecCounterB++)
+		//	{
+		//		for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
+		//		{
+		//			for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
+		//			{
+		//				if (gridVec[VecCounterB].beenChecked == false)
+		//				{
+		//					if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+		//					{
+		//						gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
+		//						gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+		//					}
+		//				}
+		//			}
+		//		}
+		//	}
+		//	gridVec[VecCounter].beenChecked = true;
+		//}
 	int numVerts = m_numPrims * 3;
 
 	////calculate the normals for the basic lighting in the base shader
@@ -496,7 +541,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
 	}
 
-	BuildIB(_GD, indices);
+	//BuildIB(_GD, indices);
 
 	//structures from creating buffers
 	//D3D11_BUFFER_DESC bd;
@@ -513,8 +558,8 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	hr = _GD->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
 
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
-	if (numVerts != 0)
-	BuildVB(_GD, numVerts, &m_vertices[0]);
+	//if (numVerts != 0)
+	//BuildVB(_GD, numVerts, &m_vertices[0]);
 
 	//Rasterizer
 	D3D11_RASTERIZER_DESC raster;
@@ -584,7 +629,6 @@ void Terrain::Tick(GameData * _GD)
 		m_vertices[i].texCoord = Vector2::One;
 		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
 	}
-
 	BuildIB(dev, indices);
 	//Buffer creation is shared with Init function
 	bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
@@ -607,6 +651,13 @@ void Terrain::Tick(GameData * _GD)
 	}
 	VBGO::Tick(_GD);
 }
+//
+//void Terrain::Draw(DrawData * _DD)
+//{
+//	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, &InitData, 0, 0);
+//	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices, 0, 0);
+//	VBGO::Draw(_DD);
+//}
 
 void Terrain::Remake()
 {
