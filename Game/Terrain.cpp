@@ -451,7 +451,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 					//		}
 					//	}
 					//}
-					////METHOD 3
+					//METHOD 3
 					for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
 					{
 						for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
@@ -666,6 +666,33 @@ void Terrain::Remake()
 
 //void Terrain::seamlessMesh(GRIDCELL)
 //{
+//}
+
+//void Terrain::Sorter(std::vector<GRIDCELL> b) //METHOD 5
+//{
+//	for (int VecCounter = 0; VecCounter < b.size(); VecCounter++)
+//	{
+//		for (int VecCounterB = 0; VecCounterB < b.size(); VecCounterB++)
+//		{
+//			for (int GridElem = 0; GridElem < b[VecCounter].size; GridElem++)
+//			{
+//				for (int GridElemB = 0; GridElemB < b[VecCounter].size; GridElemB++)
+//				{
+//					if (b[VecCounterB].beenChecked == false)
+//					{
+//						if (b[VecCounter].p[GridElem]->GetPos() == b[VecCounterB].p[GridElemB]->GetPos())
+//						{
+//							b[VecCounter].p[GridElem] = b[VecCounterB].p[GridElemB];
+//							b[VecCounter].val[GridElem] = b[VecCounterB].val[GridElemB];
+//						}
+//					}
+//				}
+//			}
+//		}
+//		b[VecCounter].beenChecked = true;
+//		gridVec.push_back(b[VecCounter]);
+//	}
+//
 //}
 
 float Terrain::PosChanger(Vector3 _pos, int i)

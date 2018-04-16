@@ -29,6 +29,7 @@ public:
 	Vector3 getSize() { return m_size; };
 	std::vector<myVertex> getvert() { return m_vertices; };
 	void seamlessMesh();
+	//void Sorter(std::vector <GRIDCELL>);
 protected:
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
@@ -40,6 +41,7 @@ protected:
 	Vector3 m_size;
 	ID3D11Device* dev;
 	std::vector <GRIDCELL> gridVec;
+	std::vector <GRIDCELL> holderVec;
 	int testCount = 0;
 	D3D11_BUFFER_DESC bd;
 	D3D11_SUBRESOURCE_DATA InitData;

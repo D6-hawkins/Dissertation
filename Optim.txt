@@ -1,0 +1,43 @@
+Initial Run: - Method 1
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 18.55s
+Without: 01.56s
+
+2nd Run: - Method 2
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 51.37s
+Without: 01.56s
+Changes: Moved connection to seperate for loops - Means more checks are run at the end
+
+3rd Run: - Method 3
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 12.71s
+Without: 01.56s
+Changes: Swapped which was checked first, so it checks existing vector elements first in the edition
+
+4th Run: - method 4
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 44.63
+Without: 01.56s
+Changes: Moved connection to seperate for loops, added a check so each element is checked once to reduce redundancy
+
+5th Run: - - Method 3
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 12.68
+Without: 01.35s
+Changes: removed some unneeded  buffer stuff from Init
+
+6th Run: - - Method 3
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 12.70
+Without: 01.35s
+Changes: Swapped which vertex became which in Init
+
+
+7th Run: - Method 5
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 44.25
+Without: 01.35s
+Changes: added holder vector, used function to sort into gridVec
+
+
