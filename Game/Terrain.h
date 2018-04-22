@@ -34,7 +34,9 @@ public:
 	//void Sorter(std::vector <GRIDCELL>);
 	void terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale);
 	std::vector <GRIDCELL> gridVec;
+	bool getShouldBeShader() { return ShaderCode;};
 protected:
+	bool ShaderCode = true;
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
 	std::vector<myVertex> m_vertices;

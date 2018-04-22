@@ -13,8 +13,8 @@ using namespace DirectX;
 using namespace SimpleMath;
 
 //as passing to GPU needs to be correctly memory aligned
-__declspec(align(16))
-struct ConstantBuffer
+
+_declspec(align(16)) struct ConstantBuffer
 {
 	Matrix	world;
 	Matrix	view;
@@ -23,6 +23,15 @@ struct ConstantBuffer
 	Color	lightCol;
 	Color	ambientCol;
 	Vector3 lightPos;
-};
 
+	void* operator new(size_t i)
+	{
+		return _mm_malloc(i, 16);
+	}
+
+	void operator delete(void* p)
+	{
+		_mm_free(p);
+	}
+};
 #endif

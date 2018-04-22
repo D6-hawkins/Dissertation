@@ -71,10 +71,11 @@ void CMOGO::Draw(DrawData* _DD)
 	//a dirty hack as the CMO model drawer breaks the depth stencil state
 	ID3D11DepthStencilState *DSS = nullptr;
 	UINT ref;
-
+	_DD->m_pd3dImmediateContext->VSSetShader(NULL, NULL, 0);
+	//_DD->m_pd3dImmediateContext->GSSetShader(NULL, NULL, 0);
+	_DD->m_pd3dImmediateContext->PSSetShader(NULL, NULL, 0);
 	//pick up a copy of the current state...
 	_DD->m_pd3dImmediateContext->OMGetDepthStencilState(&DSS, &ref);
-
 	m_model->Draw(_DD->m_pd3dImmediateContext, *_DD->m_states, //graphics device and CommonStates reuqired by model system
 		m_worldMat, //world transform to poisiton this model in the world
 		_DD->m_cam->GetView(), _DD->m_cam->GetProj(), //veiw and projection matrix of the camera

@@ -151,6 +151,7 @@
   <ItemGroup>
     <None Include="shader.fx">
       <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -2,7 +2,7 @@
 #define _VB_GO_H_
 #include "gameobject.h"
 #include "ConstantBuffer.h"
-
+#include <D3D11.h>
 //=================================================================
 //the base Game Object drawn using a Vertex and Index Buffer
 //all of the main aspects of drawing it have a default which is pointed to by a static pointer
@@ -29,6 +29,8 @@ protected:
 	//Direct X information for the model for this GameObject
 	ID3D11Buffer* m_VertexBuffer;
 	ID3D11Buffer* m_IndexBuffer;
+	ID3D11Buffer* m_StreamBuffer;
+	//ID3D11Buffer* m_StreamBuffer;
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
 	UINT m_numPrims;
 
@@ -46,6 +48,7 @@ protected:
 	static ID3D11ShaderResourceView* s_pTextureRV;
 	//deafult const buffer
 	static ID3D11Buffer*           s_pConstantBuffer;	//GPU side
+	static ID3D11Buffer*		   s_pStreamBuffer;
 	static ConstantBuffer*			s_pCB;				//CPU side
 	//default sampler
 	static ID3D11SamplerState*		s_pSampler;
@@ -61,6 +64,8 @@ protected:
 	ID3D11GeometryShader* m_pGeometryShader;
 	//my pixelshader
 	ID3D11PixelShader*      m_pPixelShader;
+
+	ID3D11Buffer*		   m_pStreamBuffer;
 	//my compute shader
 	ID3D11ComputeShader*	m_pComputeShader;
 	//my texture
@@ -79,9 +84,10 @@ protected:
 	//once populated build a Vertex Buffer
 	void BuildVB(ID3D11Device* _GD, int _numVerts, void* _vertices);
 
+	void BuildSB(ID3D11Device* _GD, int _numVerts, void* _vertices);
 	static HRESULT CompileShaderFromFile(WCHAR* _szFileName, LPCSTR _szEntryPoint, LPCSTR _szShaderModel, ID3DBlob** _ppBlobOut);
 
-
+	//UINT stride;
 };
 
 #endif

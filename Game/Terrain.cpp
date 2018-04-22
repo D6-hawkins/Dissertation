@@ -2,7 +2,6 @@
 #include "vertex.h"
 #include "Voxel.h"
 
-
 struct gridHolder {
 	std::vector<GRIDCELL> grid;
 };
@@ -433,6 +432,11 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	_GDStore = _GD;
 	std::thread m(&Terrain::terrainBuilder,this, _origin, _size, _scale);
 	m.join();
+	//here
+
+
+
+
 	//std::thread t(&Terrain::seamlessMesh, this);
 		//for (int XCounter = 0; XCounter < _size.x; XCounter++)
 		//{
@@ -566,7 +570,6 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 		m_vertices[i].texCoord = Vector2::One;
 		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
 	}
-
 	VBGO::BuildIB(_GD, indices);
 
 	//structures from creating buffers
@@ -646,23 +649,23 @@ void Terrain::Tick(GameData * _GD)
 		m_vertices[V2].Norm = norm;
 		m_vertices[V3].Norm = norm;
 	}
-	//int* indices = new int[numVerts];
+	int* indices = new int[numVerts];
 	//as using the standard VB shader set the tex-coords somewhere safe
 	for (int i = 0; i<numVerts; i++)
 	{
-		//indices[i] = i;
+		indices[i] = i;
 		m_vertices[i].texCoord = Vector2::One;
 		m_vertices[i].Color = Color(0.0, 1.0, 1.0, 1.0);
 	}
-	////BuildIB(dev, indices);
-	//////Buffer creation is shared with Init function
-	////bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
-	////InitData.pSysMem = indices;
-	////hr = dev->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
+	//BuildIB(dev, indices);
+	////Buffer creation is shared with Init function
+	//bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
+	//InitData.pSysMem = indices;
+	//hr = dev->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
 
-	////m_IndexFormat = DXGI_FORMAT_R32_UINT;
-	////if (numVerts != 0)
-	////BuildVB(dev, numVerts, &m_vertices[0]);
+	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
+	//if (numVerts != 0)
+	//BuildVB(dev, numVerts, &m_vertices[0]);
 	if (counter != 30)
 	{
 		for (int i = 0; i < gridVec.size(); i++)

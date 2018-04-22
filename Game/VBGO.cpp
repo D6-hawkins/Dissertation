@@ -28,6 +28,7 @@ ID3D11GeometryShader*		VBGO::s_pGeometryShader = nullptr;
 //GPU side
 ID3D11Buffer*				VBGO::s_pConstantBuffer = nullptr;
 
+ID3D11Buffer*				VBGO::s_pStreamBuffer = nullptr;
 //ComputeShader
 ID3D11ComputeShader*		VBGO::s_pComputeShader = nullptr;
 //CPU side	
@@ -42,6 +43,8 @@ VBGO::VBGO()
 	//set up Buffers
 	m_VertexBuffer = NULL;
 	m_IndexBuffer = NULL;
+	m_StreamBuffer = NULL;
+
 	m_numPrims = 0;
 
 	m_pVertexShader = nullptr;
@@ -108,7 +111,7 @@ void VBGO::Draw(DrawData* _DD)
 	_DD->m_pd3dImmediateContext->UpdateSubresource(useCB, 0, NULL, useCBData, 0, 0);
 	_DD->m_pd3dImmediateContext->VSSetConstantBuffers(0, 1, &useCB);
 	_DD->m_pd3dImmediateContext->PSSetConstantBuffers(0, 1, &useCB);
-
+	_DD->m_pd3dImmediateContext->GSSetConstantBuffers(0, 1, &useCB);
 	//unless it has it own set them to the static defaults
 
 	//set primitive type used
@@ -130,6 +133,8 @@ void VBGO::Draw(DrawData* _DD)
 	//Set Geometery shader
 	ID3D11GeometryShader* useGS = m_pGeometryShader ? m_pGeometryShader : s_pGeometryShader;
 	_DD->m_pd3dImmediateContext->GSSetShader(useGS, NULL, 0);
+
+	_DD->m_pd3dImmediateContext->SOSetTargets(1, &s_pStreamBuffer, &offset);
 	//set Texture
 	ID3D11ShaderResourceView* useTex = m_pTextureRV ? m_pTextureRV : s_pTextureRV;
 	_DD->m_pd3dImmediateContext->PSSetShaderResources(0, 1, &useTex);
@@ -138,8 +143,8 @@ void VBGO::Draw(DrawData* _DD)
 	ID3D11SamplerState* useSample = m_pSampler ? m_pSampler : s_pSampler;
 	_DD->m_pd3dImmediateContext->PSSetSamplers(0, 1, &useSample);
 	//Set ComputeShader
-	ID3D11ComputeShader* useCS = m_pComputeShader ? m_pComputeShader : s_pComputeShader;
-	_DD->m_pd3dImmediateContext->CSSetShader(useCS, NULL, 0);
+	//ID3D11ComputeShader* useCS = m_pComputeShader ? m_pComputeShader : s_pComputeShader;
+	//_DD->m_pd3dImmediateContext->CSSetShader(useCS, NULL, 0);
 	//and draw
 	_DD->m_pd3dImmediateContext->DrawIndexed(3 * m_numPrims, 0, 0);//number here will need to change depending on the primative topology!
 }
@@ -179,24 +184,37 @@ void VBGO::Init(ID3D11Device* _GD)
 
 	//default vertex shader
 	ID3DBlob* pVertexShaderBuffer = NULL;
-	HRESULT hr = CompileShaderFromFile(L"../Assets/shader.fx", "VS", "vs_4_0_level_9_1", &pVertexShaderBuffer);
+	HRESULT hr = CompileShaderFromFile(L"../Assets/shader.fx", "VS", "vs_4_0_level_9_1", &pVertexShaderBuffer); //
 	_GD->CreateVertexShader(pVertexShaderBuffer->GetBufferPointer(), pVertexShaderBuffer->GetBufferSize(), NULL, &s_pVertexShader);
-	//default pixelshader
+	////default pixelshader
 	ID3DBlob* pPixelShaderBuffer = NULL;
 	hr = CompileShaderFromFile(L"../Assets/shader.fx", "PS", "ps_4_0_level_9_1", &pPixelShaderBuffer);
 	_GD->CreatePixelShader(pPixelShaderBuffer->GetBufferPointer(), pPixelShaderBuffer->GetBufferSize(), NULL, &s_pPixelShader);
 
-	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( DEBUG ) || defined( _DEBUG )
-	flags |= D3DCOMPILE_DEBUG;
-#endif
-	// Prefer higher CS shader profile when possible as CS 5.0 provides better performance on 11-class hardware.
-	LPCSTR profile = (_GD->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0) ? "cs_5_0" : "cs_4_0";
-	const D3D_SHADER_MACRO defines[] =
+
+	D3D11_SO_DECLARATION_ENTRY pDecl[] =
 	{
-		"EXAMPLE_DEFINE", "1",
-		NULL, NULL
+		// semantic name, semantic index, start component, component count, output slot
+		{ 0,"SV_POSITION", 0, 0, 4, 0},   // output all components of position
+		{ 0,"NORMAL", 0, 0, 3, 0},     // output the first 3 of the normal  // output the first 2 texture coordinates
+		{ 0,"TEXCOORD", 0, 0, 2, 0},
 	};
+	ID3DBlob* pGeometryShaderBuffer = nullptr;
+	hr = CompileShaderFromFile(L"../Game/terrainShader.fx", "GS", "gs_5_0", &pGeometryShaderBuffer);
+	//_GD->CreateGeometryShader(pGeometryShaderBuffer->GetBufferPointer(), pGeometryShaderBuffer->GetBufferSize(), NULL, &s_pGeometryShader);
+	hr = _GD->CreateGeometryShaderWithStreamOutput(pGeometryShaderBuffer->GetBufferPointer(), pGeometryShaderBuffer->GetBufferSize(), pDecl, ARRAYSIZE(pDecl), NULL, 0, 0, NULL, &s_pGeometryShader);
+	
+//	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+//#if defined( DEBUG ) || defined( _DEBUG )
+//	flags |= D3DCOMPILE_DEBUG;
+//#endif
+//	// Prefer higher CS shader profile when possible as CS 5.0 provides better performance on 11-class hardware.
+//	LPCSTR profile = (_GD->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0) ? "cs_5_0" : "cs_4_0";
+//	const D3D_SHADER_MACRO defines[] =
+//	{
+//		"EXAMPLE_DEFINE", "1",
+//		NULL, NULL
+//	};
 	////default Compute Shader
 	//ID3DBlob* shaderBlob = nullptr;
 	//ID3DBlob* errorBlob = nullptr;
@@ -221,12 +239,10 @@ void VBGO::Init(ID3D11Device* _GD)
 	//return hr;*/
 	//_GD->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), NULL, &s_pComputeShader);
 
-	////default geometry shader
-	//ID3DBlob* pGeometryShaderBuffer = NULL;
-	//hr = CompileShaderFromFile(L"../Assets/shader.fx", "GS", "gs_5_0", &pGeometryShaderBuffer);
-	//_GD->CreateGeometryShader(pGeometryShaderBuffer->GetBufferPointer(), pGeometryShaderBuffer->GetBufferSize(), NULL, &s_pGeometryShader);
-	////default vertex layout
-	//printf("yeet");
+	//default geometry shader
+
+
+	//default vertex layout
 
 	_GD->CreateInputLayout(myVertexLayout, ARRAYSIZE(myVertexLayout), pVertexShaderBuffer->GetBufferPointer(),
 		pVertexShaderBuffer->GetBufferSize(), &s_pVertexLayout);
@@ -236,7 +252,20 @@ void VBGO::Init(ID3D11Device* _GD)
 #else
 	hr = CreateDDSTextureFromFile(_GD, L"../Release/white.dds", nullptr, &s_pTextureRV);
 #endif
+	//OUTPUT BUFFER
+	//structures from creating buffers
+	int m_nBufferSize = 1000000;
 
+	D3D11_BUFFER_DESC bufferDesc =
+	{
+		m_nBufferSize,
+		D3D11_USAGE_DEFAULT,
+		D3D11_BIND_STREAM_OUTPUT,
+		0,
+		0,
+		0
+	};
+	_GD->CreateBuffer(&bufferDesc, NULL, &s_pStreamBuffer);
 	//deafult const buffer
 	//GPU side
 	D3D11_BUFFER_DESC bd;
@@ -304,6 +333,8 @@ void VBGO::CleanUp()
 	DESTROY(s_pTextureRV);
 	DESTROY(s_pConstantBuffer);
 	DESTROY(s_pComputeShader);
+	DESTROY(s_pGeometryShader);
+	DESTROY(s_pStreamBuffer);
 	if (s_pCB)
 	{
 		delete s_pCB;
@@ -346,4 +377,23 @@ void VBGO::BuildVB(ID3D11Device* _GD, int _numVerts, void* _vertices)
 	ZeroMemory(&InitData, sizeof(InitData));
 	InitData.pSysMem = _vertices;
 	hr = _GD->CreateBuffer(&bd, &InitData, &m_VertexBuffer);
+
+}
+void VBGO::BuildSB(ID3D11Device* _GD, int _numVerts, void* _vertices)
+{
+	//////OUTPUT BUFFER
+	//////structures from creating buffers
+	//D3D11_BUFFER_DESC bd;
+	//D3D11_SUBRESOURCE_DATA InitData;
+	//HRESULT hr = S_OK;
+
+	////build vertex buffer
+	//ZeroMemory(&bd, sizeof(bd));
+	//bd.Usage = D3D11_USAGE_DEFAULT;
+	//bd.ByteWidth = sizeof(myVertex) * _numVerts;
+	//bd.BindFlags = D3D11_BIND_STREAM_OUTPUT;
+	//bd.CPUAccessFlags = 0;
+	//ZeroMemory(&InitData, sizeof(InitData));
+	//InitData.pSysMem = _vertices;
+	//hr = _GD->CreateBuffer(&bd, &InitData, &m_StreamBuffer);
 }

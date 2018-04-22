@@ -1,17 +1,16 @@
-//struct  TRIANGLE{
-//	vector <float, 3> XYZ;
-//};
-//struct GRIDCELL {
-//	vector <float, 3> XYZ;
-//	double val[8];
-//};
-//RWStructuredBuffer<GRIDCELL> grid;
-//struct ComputeShaderInput
-//{
-//	
-//};
-//[numthreads(1, 1, 1)]
-//void main(uint3 id : SV_DispatchThreadID)
-//{
-//	
-//}
+vector storage;
+struct GS_OUTPUT
+{
+	float4 worldPos: POSITION;
+	float4 Color : COLOR;
+	float2 texCoord : TEXCOORD;
+	float4 Pos : SV_POSITION;
+};
+//--------------------------------------------------------------------------------------
+// Geometry Shader
+//-------------------------------------------------------------------------------------- 
+[maxvertexcount(3)]
+void GS(triangle GS_OUTPUT input[3], inout TriangleStream<GS_OUTPUT> TriStream)
+{
+
+}

@@ -164,12 +164,12 @@ Game::~Game()
 	m_GameObjects.clear();
 
 
-	//and the 2D ones
-	for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
-	{
-		delete (*it);
-	}
-	m_GameObject2Ds.clear();
+	////and the 2D ones
+	//for (list<GameObject2D *>::iterator it = m_GameObject2Ds.begin(); it != m_GameObject2Ds.end(); it++)
+	//{
+	//	delete (*it);
+	//}
+	//m_GameObject2Ds.clear();
 
 	//clear away CMO render system
 	delete m_states;
