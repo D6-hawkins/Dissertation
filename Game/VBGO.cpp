@@ -22,6 +22,8 @@ ID3D11InputLayout*			VBGO::s_pVertexLayout = nullptr;
 ID3D11PixelShader*			VBGO::s_pPixelShader = nullptr;
 //default texture (white square)
 ID3D11ShaderResourceView*	VBGO::s_pTextureRV = nullptr;
+//default geometry shader
+ID3D11GeometryShader*		VBGO::s_pGeometryShader = nullptr;
 //deafult const buffer
 //GPU side
 ID3D11Buffer*				VBGO::s_pConstantBuffer = nullptr;
@@ -45,6 +47,7 @@ VBGO::VBGO()
 	m_pVertexShader = nullptr;
 	m_pVertexLayout = nullptr;
 	m_pComputeShader = nullptr;
+	m_pGeometryShader = nullptr;
 	m_pPixelShader = nullptr;
 	m_pTextureRV = nullptr;
 	m_pConstantBuffer = nullptr;
@@ -66,6 +69,7 @@ VBGO::~VBGO()
 	DESTROY(m_pVertexShader);
 	DESTROY(m_pVertexLayout);
 	DESTROY(m_pPixelShader);
+	DESTROY(m_pGeometryShader);
 	DESTROY(m_pTextureRV);
 	DESTROY(m_pConstantBuffer);
 	DESTROY(m_pComputeShader);
@@ -84,7 +88,7 @@ void VBGO::Draw(DrawData* _DD)
 	//set raster state
 	ID3D11RasterizerState* useRasterS = m_pRasterState ? m_pRasterState : s_pRasterState;
 	_DD->m_pd3dImmediateContext->RSSetState(useRasterS);
-
+	
 	//set standard Constant Buffer to match this object
 	s_pCB->world = m_worldMat.Transpose();
 	s_pCB->rot = m_rotMat.Transpose();
@@ -123,6 +127,9 @@ void VBGO::Draw(DrawData* _DD)
 	ID3D11PixelShader* usePS = m_pPixelShader ? m_pPixelShader : s_pPixelShader;
 	_DD->m_pd3dImmediateContext->PSSetShader(usePS, NULL, 0);
 
+	//Set Geometery shader
+	ID3D11GeometryShader* useGS = m_pGeometryShader ? m_pGeometryShader : s_pGeometryShader;
+	_DD->m_pd3dImmediateContext->GSSetShader(useGS, NULL, 0);
 	//set Texture
 	ID3D11ShaderResourceView* useTex = m_pTextureRV ? m_pTextureRV : s_pTextureRV;
 	_DD->m_pd3dImmediateContext->PSSetShaderResources(0, 1, &useTex);
@@ -174,7 +181,6 @@ void VBGO::Init(ID3D11Device* _GD)
 	ID3DBlob* pVertexShaderBuffer = NULL;
 	HRESULT hr = CompileShaderFromFile(L"../Assets/shader.fx", "VS", "vs_4_0_level_9_1", &pVertexShaderBuffer);
 	_GD->CreateVertexShader(pVertexShaderBuffer->GetBufferPointer(), pVertexShaderBuffer->GetBufferSize(), NULL, &s_pVertexShader);
-
 	//default pixelshader
 	ID3DBlob* pPixelShaderBuffer = NULL;
 	hr = CompileShaderFromFile(L"../Assets/shader.fx", "PS", "ps_4_0_level_9_1", &pPixelShaderBuffer);
@@ -191,31 +197,37 @@ void VBGO::Init(ID3D11Device* _GD)
 		"EXAMPLE_DEFINE", "1",
 		NULL, NULL
 	};
-	//default Compute Shader
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	//hr = CompileShaderFromFile(L"../Assets/terrainShader.fx", "CS", "cs_5_1", &shaderBlob);
-	hr = D3DCompileFromFile(L"../Game/terrainShader.fx", defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", profile, flags, 0, &shaderBlob, &errorBlob);
-	if (FAILED(hr))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			errorBlob->Release();
-		}
+	////default Compute Shader
+	//ID3DBlob* shaderBlob = nullptr;
+	//ID3DBlob* errorBlob = nullptr;
+	////hr = CompileShaderFromFile(L"../Assets/terrainShader.fx", "CS", "cs_5_1", &shaderBlob);
+	//hr = D3DCompileFromFile(L"../Game/terrainShader.fx", defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", profile, flags, 0, &shaderBlob, &errorBlob);
+	//if (FAILED(hr))
+	//{
+	//	if (errorBlob)
+	//	{
+	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	//		errorBlob->Release();
+	//	}
 
-		if (shaderBlob)
-			shaderBlob->Release();
+	//	if (shaderBlob)
+	//		shaderBlob->Release();
 
-		//return hr;
-	}
+	//	//return hr;
+	//}
 
-	/**blob = shaderBlob;
+	///**blob = shaderBlob;
 
-	return hr;*/
-	_GD->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), NULL, &s_pComputeShader);
+	//return hr;*/
+	//_GD->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), NULL, &s_pComputeShader);
 
-	//default vertex layout
+	////default geometry shader
+	//ID3DBlob* pGeometryShaderBuffer = NULL;
+	//hr = CompileShaderFromFile(L"../Assets/shader.fx", "GS", "gs_5_0", &pGeometryShaderBuffer);
+	//_GD->CreateGeometryShader(pGeometryShaderBuffer->GetBufferPointer(), pGeometryShaderBuffer->GetBufferSize(), NULL, &s_pGeometryShader);
+	////default vertex layout
+	//printf("yeet");
+
 	_GD->CreateInputLayout(myVertexLayout, ARRAYSIZE(myVertexLayout), pVertexShaderBuffer->GetBufferPointer(),
 		pVertexShaderBuffer->GetBufferSize(), &s_pVertexLayout);
 	//default texture (white square)

@@ -3,7 +3,7 @@
 
 #include "VBGO.h"
 #include <random>
-class GameData;
+//class GameData;
 class Voxel : public VBGO
 {
 public:

@@ -21,7 +21,6 @@ public:
 	//set up and then destroy all static default render stuff for VBGOs
 	static void Init(ID3D11Device* _GD);//Graphics Device NOT GameData
 	static void CleanUp();
-
 	//Update static const buffer required for deafult rendering
 	static void UpdateConstantBuffer(DrawData* _DD);
 
@@ -43,6 +42,7 @@ protected:
 	//default pixelshader
 	static ID3D11PixelShader*      s_pPixelShader;
 	//default texture (white square)
+	static ID3D11GeometryShader* s_pGeometryShader;
 	static ID3D11ShaderResourceView* s_pTextureRV;
 	//deafult const buffer
 	static ID3D11Buffer*           s_pConstantBuffer;	//GPU side
@@ -57,6 +57,8 @@ protected:
 	ID3D11VertexShader*     m_pVertexShader;
 	//my vertex layout
 	ID3D11InputLayout*      m_pVertexLayout;
+	//my geometry shader
+	ID3D11GeometryShader* m_pGeometryShader;
 	//my pixelshader
 	ID3D11PixelShader*      m_pPixelShader;
 	//my compute shader

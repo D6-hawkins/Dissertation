@@ -2,6 +2,10 @@
 #include "vertex.h"
 #include "Voxel.h"
 
+
+struct gridHolder {
+	std::vector<GRIDCELL> grid;
+};
 //Marching Cube Algorithm: http://paulbourke.net/geometry/polygonise/
 //typedef Vector3 XYZ;
 //typedef struct {
@@ -426,8 +430,9 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_size = _size;
 	m_numPrims = 0;
 	m_isolevel = isolevel;
-
+	_GDStore = _GD;
 	std::thread m(&Terrain::terrainBuilder,this, _origin, _size, _scale);
+	m.join();
 	//std::thread t(&Terrain::seamlessMesh, this);
 		//for (int XCounter = 0; XCounter < _size.x; XCounter++)
 		//{
@@ -516,43 +521,58 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 		//	}
 		//	gridVec[VecCounter].beenChecked = true;
 		//}
+	//m_numPrims = 0;
+	for (int i = 0; i < gridVec.size(); i++)
+	{
+		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
+		m_numPrims += newTris;
+		for (int Counter = 0; Counter < newTris; Counter++)
+		{
+			for (int m = 0; m < 3; m++)
+			{
+				myVertex newVert;
+				newVert.Pos = m_Triangles[Counter].p[m];
+				m_vertices.push_back(newVert);
+			}
+		}
+	}
 	int numVerts = m_numPrims * 3;
 
 	////calculate the normals for the basic lighting in the base shader
-	//for (unsigned int i = 0; i<m_numPrims; i++)
-	//{
-	//	int V1 = 3 * i;
-	//	int V2 = 3 * i + 1;
-	//	int V3 = 3 * i + 2;
+	for (unsigned int i = 0; i<m_numPrims; i++)
+	{
+		int V1 = 3 * i;
+		int V2 = 3 * i + 1;
+		int V3 = 3 * i + 2;
 
-	//	//build normals
-	//	Vector3 norm;
-	//	Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
-	//	Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
-	//	norm = vec1.Cross(vec2);
-	//	norm.Normalize();
+		//build normals
+		Vector3 norm;
+		Vector3 vec2 = m_vertices[V1].Pos - m_vertices[V2].Pos;
+		Vector3 vec1 = m_vertices[V3].Pos - m_vertices[V2].Pos;
+		norm = vec1.Cross(vec2);
+		norm.Normalize();
 
-	//	m_vertices[V1].Norm = norm;
-	//	m_vertices[V2].Norm = norm;
-	//	m_vertices[V3].Norm = norm;
-	//}
-
-	int* indices = new int[numVerts];
-
+		m_vertices[V1].Norm = norm;
+		m_vertices[V2].Norm = norm;
+		m_vertices[V3].Norm = norm;
+	}
+	//std::vector<int> indices(numVerts);
+	indices = new int[numVerts];
 	//as using the standard VB shader set the tex-coords somewhere safe
-	for (int i = 0; i<numVerts; i++)
+	for (int i = 0; i < numVerts; i++)
 	{
 		indices[i] = i;
+		//indices[i] = i;
 		m_vertices[i].texCoord = Vector2::One;
 		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
 	}
 
-	//BuildIB(_GD, indices);
+	VBGO::BuildIB(_GD, indices);
 
 	//structures from creating buffers
-	//D3D11_BUFFER_DESC bd;
-	//D3D11_SUBRESOURCE_DATA InitData;
-	//HRESULT hr = S_OK;
+	D3D11_BUFFER_DESC bd;
+	D3D11_SUBRESOURCE_DATA InitData;
+	HRESULT hr = S_OK;
 
 	//build index buffer
 	ZeroMemory(&bd, sizeof(bd));
@@ -562,10 +582,9 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	bd.CPUAccessFlags = 0;
 	InitData.pSysMem = indices;
 	hr = _GD->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
-
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	//if (numVerts != 0)
-	//BuildVB(_GD, numVerts, &m_vertices[0]);
+	VBGO::BuildVB(_GD, numVerts, &m_vertices[0]);
 
 	//Rasterizer
 	D3D11_RASTERIZER_DESC raster;
@@ -587,7 +606,6 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	ID3DBlob* pPixelShaderBuffer = NULL;
 	hr = CompileShaderFromFile(L"../Assets/shader.fx", "PS2", "ps_4_0_level_9_1", &pPixelShaderBuffer);
 	_GD->CreatePixelShader(pPixelShaderBuffer->GetBufferPointer(), pPixelShaderBuffer->GetBufferSize(), NULL, &m_pPixelShader);
-	m.join();
 	//t.join();
 }
 
@@ -628,23 +646,23 @@ void Terrain::Tick(GameData * _GD)
 		m_vertices[V2].Norm = norm;
 		m_vertices[V3].Norm = norm;
 	}
-	int* indices = new int[numVerts];
+	//int* indices = new int[numVerts];
 	//as using the standard VB shader set the tex-coords somewhere safe
 	for (int i = 0; i<numVerts; i++)
 	{
-		indices[i] = i;
+		//indices[i] = i;
 		m_vertices[i].texCoord = Vector2::One;
-		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
+		m_vertices[i].Color = Color(0.0, 1.0, 1.0, 1.0);
 	}
-	BuildIB(dev, indices);
-	//Buffer creation is shared with Init function
-	bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
-	InitData.pSysMem = indices;
-	hr = dev->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
+	////BuildIB(dev, indices);
+	//////Buffer creation is shared with Init function
+	////bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
+	////InitData.pSysMem = indices;
+	////hr = dev->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
 
-	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
-	if (numVerts != 0)
-	BuildVB(dev, numVerts, &m_vertices[0]);
+	////m_IndexFormat = DXGI_FORMAT_R32_UINT;
+	////if (numVerts != 0)
+	////BuildVB(dev, numVerts, &m_vertices[0]);
 	if (counter != 30)
 	{
 		for (int i = 0; i < gridVec.size(); i++)
@@ -658,13 +676,17 @@ void Terrain::Tick(GameData * _GD)
 	}
 	VBGO::Tick(_GD);
 }
-//
 //void Terrain::Draw(DrawData * _DD)
 //{
-//	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, &InitData, 0, 0);
-//	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices, 0, 0);
 //	VBGO::Draw(_DD);
 //}
+//
+void Terrain::Draw(DrawData * _DD)
+{
+	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, indices, 0, 0);
+	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
+	VBGO::Draw(_DD);
+}
 
 void Terrain::Remake()
 {
@@ -720,7 +742,6 @@ void Terrain::seamlessMesh()
 		}
 		//gridVec[vecC].failed = true;
 	}
-	gridVec.push_back(m_Grid);
 	//for (int gridCounter = 0; gridCounter < m_Grid.size; gridCounter++)
 	//{
 	//	for (int vecCounter = 0; vecCounter < gridVec.size(); vecCounter++)
@@ -753,10 +774,28 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 					m_Grid.size = 7;
 					//m.unlock();
 				}
+				gridVec.push_back(m_Grid);
+				//ID3D11Buffer *pStructuredBuffer;
+				//D3D11_BUFFER_DESC sbDesc;
+				//sbDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+				//sbDesc.CPUAccessFlags = 0;
+				//sbDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+				//sbDesc.StructureByteStride = sizeof(Vector4);
+				//sbDesc.ByteWidth = sizeof(Vector4) * gridVec.size();
+				//sbDesc.Usage = D3D11_USAGE_DEFAULT;
+
+				//gridHolder grid1;
+				//grid1.grid = gridVec;
+
+				//D3D11_SUBRESOURCE_DATA InitData;
+				//InitData.pSysMem = &grid1;
+				//InitData.SysMemPitch = 0;
+				//InitData.SysMemSlicePitch = 0;
+				//_GDStore->CreateBuffer(&sbDesc, &InitData, &pStructuredBuffer);
 				//gridVec.push_back(m_Grid);
-				std::thread t(&Terrain::seamlessMesh, this);
-				//if (t.joinable())
-				t.join();
+				//std::thread t(&Terrain::seamlessMesh, this);
+				////if (t.joinable())
+				//t.join();
 			}
 		}
 	}

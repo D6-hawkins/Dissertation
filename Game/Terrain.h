@@ -23,7 +23,7 @@ public:
 	void Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device* _GD);
 	void Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device* _GD);
 	void Tick(GameData* _GD) override;
-	//void Draw(DrawData* _DD) override;
+	void Draw(DrawData* _DD) override;
 	void Remake();
 	GRIDCELL getGrid() { return m_Grid; };
 	std::vector<GRIDCELL> getGridVec() { return gridVec; };
@@ -33,6 +33,7 @@ public:
 	void seamlessMesh();
 	//void Sorter(std::vector <GRIDCELL>);
 	void terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale);
+	std::vector <GRIDCELL> gridVec;
 protected:
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
@@ -43,7 +44,6 @@ protected:
 	Vector3 m_scale;
 	Vector3 m_size;
 	ID3D11Device* dev;
-	std::vector <GRIDCELL> gridVec;
 	std::vector <Voxel*> holderVec;
 	int testCount = 0;
 	D3D11_BUFFER_DESC bd;
@@ -51,6 +51,9 @@ protected:
 	HRESULT hr = S_OK;
 	int counter = 0;
 	std::mutex m;
+	ID3D11Device* _GDStore;
+	int* indices;
+	//int* indices;
 	//std::thread t;
 	//std::thread m;
 };
