@@ -129,4 +129,9 @@
       <Filter>Objects\Source</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="terrainShader.fx">
+      <Filter>Base\Headers</Filter>
+    </None>
+  </ItemGroup>
 </Project>

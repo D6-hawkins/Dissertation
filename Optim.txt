@@ -40,4 +40,39 @@ With Connection: 44.25
 Without: 01.35s
 Changes: added holder vector, used function to sort into gridVec
 
+8th Run: - Method 6 - Start of Threading era
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: unknown
+Without: 01.25s
+Changes: placed creation of terrain into a thread.
 
+9th Run: - Method 6 - Connection now threaded too
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 1:01 mins
+Without: 01.25s
+Changes: terrain creation and webbing both threaded, using locks
+
+
+10th Run: - Method 3 - both threaded now
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 13.51
+Without: 01.25s
+Changes: both threaded, no locking needed
+
+11th Run: - Method 3 - Multiple web threads being created one after another by the terrain thread.
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 13.60
+Without: 01.10s
+Changes: both threaded, if joinable check on web thread
+
+12th Run: - Method 3 - Multiple web threads being created one after another by the terrain thread.
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(10.0f, 10.0f, 10.0f), 10, 10.0f*Vector3::One, _pd3dDevice);
+With Connection: 13.40
+Without: 01.10s
+Changes: both threaded, if joinable removed
+
+13th Run: - changed starting values - laggy
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(20.0f, 20.0f, 20.0f), 0.01, 20.0f*Vector3::One, _pd3dDevice);
+With Connection: over 1min 15 seconds - stopped the loading there.
+Without: 01.73s
+Changes: both threaded, if joinable removed

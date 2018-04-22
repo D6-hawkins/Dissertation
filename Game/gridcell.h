@@ -14,7 +14,7 @@ typedef struct {
 	Voxel* p[8];
 	double val[8];
 	int size;
-	bool beenChecked = false;
+	bool failed = false;
 } GRIDCELL;
 
 

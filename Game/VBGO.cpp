@@ -6,7 +6,6 @@
 #include "vertex.h"
 #include "camera.h"
 #include "light.h"
-
 #define DESTROY( x ) if( x ){ x->Release(); x = nullptr;}
 
 //the base Game Object drawn using a Vertex and Index Buffer
@@ -26,6 +25,9 @@ ID3D11ShaderResourceView*	VBGO::s_pTextureRV = nullptr;
 //deafult const buffer
 //GPU side
 ID3D11Buffer*				VBGO::s_pConstantBuffer = nullptr;
+
+//ComputeShader
+ID3D11ComputeShader*		VBGO::s_pComputeShader = nullptr;
 //CPU side	
 ConstantBuffer*				VBGO::s_pCB = nullptr;
 //default sampler
@@ -42,6 +44,7 @@ VBGO::VBGO()
 
 	m_pVertexShader = nullptr;
 	m_pVertexLayout = nullptr;
+	m_pComputeShader = nullptr;
 	m_pPixelShader = nullptr;
 	m_pTextureRV = nullptr;
 	m_pConstantBuffer = nullptr;
@@ -65,6 +68,7 @@ VBGO::~VBGO()
 	DESTROY(m_pPixelShader);
 	DESTROY(m_pTextureRV);
 	DESTROY(m_pConstantBuffer);
+	DESTROY(m_pComputeShader);
 	//if (m_pCB) delete m_pCB; delete this where created as there will know its type
 	DESTROY(m_pSampler);
 	DESTROY(m_pRasterState);
@@ -126,7 +130,9 @@ void VBGO::Draw(DrawData* _DD)
 	//set sampler
 	ID3D11SamplerState* useSample = m_pSampler ? m_pSampler : s_pSampler;
 	_DD->m_pd3dImmediateContext->PSSetSamplers(0, 1, &useSample);
-
+	//Set ComputeShader
+	ID3D11ComputeShader* useCS = m_pComputeShader ? m_pComputeShader : s_pComputeShader;
+	_DD->m_pd3dImmediateContext->CSSetShader(useCS, NULL, 0);
 	//and draw
 	_DD->m_pd3dImmediateContext->DrawIndexed(3 * m_numPrims, 0, 0);//number here will need to change depending on the primative topology!
 }
@@ -174,10 +180,44 @@ void VBGO::Init(ID3D11Device* _GD)
 	hr = CompileShaderFromFile(L"../Assets/shader.fx", "PS", "ps_4_0_level_9_1", &pPixelShaderBuffer);
 	_GD->CreatePixelShader(pPixelShaderBuffer->GetBufferPointer(), pPixelShaderBuffer->GetBufferSize(), NULL, &s_pPixelShader);
 
+	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+#if defined( DEBUG ) || defined( _DEBUG )
+	flags |= D3DCOMPILE_DEBUG;
+#endif
+	// Prefer higher CS shader profile when possible as CS 5.0 provides better performance on 11-class hardware.
+	LPCSTR profile = (_GD->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0) ? "cs_5_0" : "cs_4_0";
+	const D3D_SHADER_MACRO defines[] =
+	{
+		"EXAMPLE_DEFINE", "1",
+		NULL, NULL
+	};
+	//default Compute Shader
+	ID3DBlob* shaderBlob = nullptr;
+	ID3DBlob* errorBlob = nullptr;
+	//hr = CompileShaderFromFile(L"../Assets/terrainShader.fx", "CS", "cs_5_1", &shaderBlob);
+	hr = D3DCompileFromFile(L"../Game/terrainShader.fx", defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "main", profile, flags, 0, &shaderBlob, &errorBlob);
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			errorBlob->Release();
+		}
+
+		if (shaderBlob)
+			shaderBlob->Release();
+
+		//return hr;
+	}
+
+	/**blob = shaderBlob;
+
+	return hr;*/
+	_GD->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), NULL, &s_pComputeShader);
+
 	//default vertex layout
 	_GD->CreateInputLayout(myVertexLayout, ARRAYSIZE(myVertexLayout), pVertexShaderBuffer->GetBufferPointer(),
 		pVertexShaderBuffer->GetBufferSize(), &s_pVertexLayout);
-
 	//default texture (white square)
 #ifdef DEBUG
 	hr = CreateDDSTextureFromFile(_GD, L"../Debug/white.dds", nullptr, &s_pTextureRV);
@@ -251,6 +291,7 @@ void VBGO::CleanUp()
 	DESTROY(s_pPixelShader);
 	DESTROY(s_pTextureRV);
 	DESTROY(s_pConstantBuffer);
+	DESTROY(s_pComputeShader);
 	if (s_pCB)
 	{
 		delete s_pCB;

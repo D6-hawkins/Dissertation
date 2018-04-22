@@ -52,12 +52,15 @@ protected:
 	//default raster state
 	static ID3D11RasterizerState*  s_pRasterState;
 
+	static ID3D11ComputeShader*   s_pComputeShader;
 	//my vertexshader
 	ID3D11VertexShader*     m_pVertexShader;
 	//my vertex layout
 	ID3D11InputLayout*      m_pVertexLayout;
 	//my pixelshader
 	ID3D11PixelShader*      m_pPixelShader;
+	//my compute shader
+	ID3D11ComputeShader*	m_pComputeShader;
 	//my texture
 	ID3D11ShaderResourceView* m_pTextureRV;
 	//my const buffer

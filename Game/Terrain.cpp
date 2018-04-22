@@ -1,6 +1,7 @@
 #include "Terrain.h"
 #include "vertex.h"
 #include "Voxel.h"
+
 //Marching Cube Algorithm: http://paulbourke.net/geometry/polygonise/
 //typedef Vector3 XYZ;
 //typedef struct {
@@ -352,8 +353,9 @@ int Polygonise(GRIDCELL grid, double isolevel, TRIANGLE *triangles)
 	if (grid.val[7] < isolevel) cubeindex |= 128;
 
 	/* Cube is entirely in/out of the surface */
-	if (edgeTable[cubeindex] == 0)
-		return(0);
+	//if (edgeTable[cubeindex] == 0)
+	//	grid.failed = true;
+	//	return(0);
 
 	/* Find the vertices where the surface intersects the cube */
 	if (edgeTable[cubeindex] & 1)
@@ -424,53 +426,57 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_size = _size;
 	m_numPrims = 0;
 	m_isolevel = isolevel;
-		for (int XCounter = 0; XCounter < _size.x; XCounter++)
-		{
-			for (int YCounter = 0; YCounter < _size.y; YCounter++)
-			{
-				for (int ZCounter = 0; ZCounter < _size.z; ZCounter++)
-				{
-					for (int i = 0; i < 8; i++)
-					{
-						m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
-						m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
-						m_Grid.size = 7;
-					}
-					//METHOD 1
-					//for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
-					//{
-					//	for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
-					//	{
-					//		for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
-					//		{
-					//			if (m_Grid.p[GridC]->GetPos() == gridVec[vecC].p[innerVecC]->GetPos()) //If any of the positions of the new grid positions match existing positions
-					//			{
-					//				m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
-					//				m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
-					//			}
-					//		}
-					//	}
-					//}
-					//METHOD 3
-					for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
-					{
-						for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
-						{
-							for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
-							{
-								if (gridVec[vecC].p[innerVecC]->GetPos() == m_Grid.p[GridC]->GetPos()) //If any of the positions of the new grid positions match existing positions
-								{
-									m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
-									m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
-								}
-							}
-						}
-					}
-					gridVec.push_back(m_Grid);
-				}
-			}
-		}
-		//METHOD 2
+
+	std::thread m(&Terrain::terrainBuilder,this, _origin, _size, _scale);
+	//std::thread t(&Terrain::seamlessMesh, this);
+		//for (int XCounter = 0; XCounter < _size.x; XCounter++)
+		//{
+		//	for (int YCounter = 0; YCounter < _size.y; YCounter++)
+		//	{
+		//		for (int ZCounter = 0; ZCounter < _size.z; ZCounter++)
+		//		{
+		//			for (int i = 0; i < 8; i++)
+		//			{
+		//				m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
+		//				m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
+		//				m_Grid.size = 7;
+		//			}
+		//			gridVec.push_back(m_Grid);
+		//			//METHOD 1
+		//			//for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+		//			//{
+		//			//	for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+		//			//	{
+		//			//		for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+		//			//		{
+		//			//			if (m_Grid.p[GridC]->GetPos() == gridVec[vecC].p[innerVecC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+		//			//			{
+		//			//				m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
+		//			//				m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
+		//			//			}
+		//			//		}
+		//			//	}
+		//			//}
+		////			//METHOD 3
+		////			for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+		////			{
+		////				for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+		////				{
+		////					for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+		////					{
+		////						if (gridVec[vecC].p[innerVecC]->GetPos() == m_Grid.p[GridC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+		////						{
+		////							m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
+		////							m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
+		////						}
+		////					}
+		////				}
+		////			}
+		//		}
+		//	}
+		//}
+		//seamlessMesh();
+		////METHOD 2
 		//for (int VecCounter = 0; VecCounter < gridVec.size(); VecCounter++)
 		//{
 		//	for (int VecCounterB = 0; VecCounterB < gridVec.size(); VecCounterB++)
@@ -581,7 +587,8 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	ID3DBlob* pPixelShaderBuffer = NULL;
 	hr = CompileShaderFromFile(L"../Assets/shader.fx", "PS2", "ps_4_0_level_9_1", &pPixelShaderBuffer);
 	_GD->CreatePixelShader(pPixelShaderBuffer->GetBufferPointer(), pPixelShaderBuffer->GetBufferSize(), NULL, &m_pPixelShader);
-
+	m.join();
+	//t.join();
 }
 
 
@@ -638,7 +645,7 @@ void Terrain::Tick(GameData * _GD)
 	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	if (numVerts != 0)
 	BuildVB(dev, numVerts, &m_vertices[0]);
-	if (counter != 300)
+	if (counter != 30)
 	{
 		for (int i = 0; i < gridVec.size(); i++)
 		{
@@ -694,6 +701,66 @@ void Terrain::Remake()
 //	}
 //
 //}
+
+void Terrain::seamlessMesh()
+{
+	for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+	{
+		for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+		{
+			for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+			{
+				//if (gridVec[vecC].failed == false)
+				if (gridVec[vecC].p[innerVecC]->GetPos() == m_Grid.p[GridC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+				{
+					m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
+					m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
+				}
+			}
+		}
+		//gridVec[vecC].failed = true;
+	}
+	gridVec.push_back(m_Grid);
+	//for (int gridCounter = 0; gridCounter < m_Grid.size; gridCounter++)
+	//{
+	//	for (int vecCounter = 0; vecCounter < gridVec.size(); vecCounter++)
+	//	{
+	//		for (int insideGrid = 0; insideGrid < gridVec[vecCounter].size; insideGrid++)
+	//		{
+	//			m_Grid.p[insideGrid] = gridVec[gridCounter].p[vecCounter];
+	//			m_Grid.val[insideGrid] = gridVec[gridCounter].val[vecCounter];
+	//		}
+	//	}
+	//}
+	//gridVec.push_back(m_Grid);
+}
+
+void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
+{
+	for (int XCounter = 0; XCounter < _size.x; XCounter++)
+	{
+		for (int YCounter = 0; YCounter < _size.y; YCounter++)
+		{
+			for (int ZCounter = 0; ZCounter < _size.z; ZCounter++)
+			{
+				for (int i = 0; i < 8; i++)
+				{
+					//m.lock();
+					m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
+
+					m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
+
+					m_Grid.size = 7;
+					//m.unlock();
+				}
+				//gridVec.push_back(m_Grid);
+				std::thread t(&Terrain::seamlessMesh, this);
+				//if (t.joinable())
+				t.join();
+			}
+		}
+	}
+}
 
 float Terrain::PosChanger(Vector3 _pos, int i)
 {

@@ -7,6 +7,8 @@
 #include <math.h>
 #include "vertex.h"
 #include "DrawData.h"
+#include <mutex>
+#include <thread>
 class Voxel;
 typedef Vector3 XYZ;
 typedef struct {
@@ -30,6 +32,7 @@ public:
 	std::vector<myVertex> getvert() { return m_vertices; };
 	void seamlessMesh();
 	//void Sorter(std::vector <GRIDCELL>);
+	void terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale);
 protected:
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
@@ -41,12 +44,15 @@ protected:
 	Vector3 m_size;
 	ID3D11Device* dev;
 	std::vector <GRIDCELL> gridVec;
-	std::vector <GRIDCELL> holderVec;
+	std::vector <Voxel*> holderVec;
 	int testCount = 0;
 	D3D11_BUFFER_DESC bd;
 	D3D11_SUBRESOURCE_DATA InitData;
 	HRESULT hr = S_OK;
 	int counter = 0;
+	std::mutex m;
+	//std::thread t;
+	//std::thread m;
 };
 
 #endif
