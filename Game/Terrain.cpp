@@ -430,7 +430,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_numPrims = 0;
 	m_isolevel = isolevel;
 	_GDStore = _GD;
-	std::thread m(&Terrain::terrainBuilder,this, _origin, _size, _scale);
+	std::thread m(&Terrain::terrainBuilder, this, _origin, _size, _scale);
 	m.join();
 	//here
 
@@ -543,7 +543,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	int numVerts = m_numPrims * 3;
 
 	////calculate the normals for the basic lighting in the base shader
-	for (unsigned int i = 0; i<m_numPrims; i++)
+	for (unsigned int i = 0; i < m_numPrims; i++)
 	{
 		int V1 = 3 * i;
 		int V2 = 3 * i + 1;
@@ -588,7 +588,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	//if (numVerts != 0)
 	VBGO::BuildVB(_GD, numVerts, &m_vertices[0]);
-
+	VBGO::BuildSB(_GD, numVerts, &m_vertices[0]);
 	//Rasterizer
 	D3D11_RASTERIZER_DESC raster;
 	raster.AntialiasedLineEnable = false;
@@ -687,7 +687,8 @@ void Terrain::Tick(GameData * _GD)
 void Terrain::Draw(DrawData * _DD)
 {
 	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, indices, 0, 0);
-	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
+	//_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
+	//_DD->m_pd3dImmediateContext->UpdateSubresource(m_StreamBuffer, 0, NULL, &m_vertices[0], 0, 0);
 	VBGO::Draw(_DD);
 }
 

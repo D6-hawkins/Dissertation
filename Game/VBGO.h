@@ -25,7 +25,7 @@ public:
 	static void UpdateConstantBuffer(DrawData* _DD);
 
 protected:
-
+	int t = 0;
 	//Direct X information for the model for this GameObject
 	ID3D11Buffer* m_VertexBuffer;
 	ID3D11Buffer* m_IndexBuffer;
