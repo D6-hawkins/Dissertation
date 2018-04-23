@@ -46,6 +46,7 @@ protected:
 	//default texture (white square)
 	static ID3D11GeometryShader* s_pGeometryShader;
 	static ID3D11ShaderResourceView* s_pTextureRV;
+	static ID3D11ShaderResourceView* s_pBufferRV;
 	//deafult const buffer
 	static ID3D11Buffer*           s_pConstantBuffer;	//GPU side
 	static ID3D11Buffer*		   s_pStreamBuffer;
@@ -70,6 +71,8 @@ protected:
 	ID3D11ComputeShader*	m_pComputeShader;
 	//my texture
 	ID3D11ShaderResourceView* m_pTextureRV;
+
+	ID3D11ShaderResourceView* m_pBufferRV;
 	//my const buffer
 	ID3D11Buffer*           m_pConstantBuffer; //GPU side
 	void*					m_pCB;//CPU side
