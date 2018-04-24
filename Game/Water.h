@@ -5,6 +5,7 @@
 #include "GameData.h"
 #include <vector>
 #include "gridcell.h"
+#include "Terrain.h"
 class Water : public VBGO
 {
 public:
@@ -16,7 +17,10 @@ public:
 	float getErode();
 	void setGrounded(bool val) { grounded = val; };
 	bool isGrounded() { return grounded; };
+	void getrandomGrid();
 private:
+	int waterPosStart;
+	std::vector<GRIDCELL> gridVec;
 	bool isAlive;
 	float erodeVal = 1.0f;
 	bool grounded;

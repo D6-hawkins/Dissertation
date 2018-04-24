@@ -356,9 +356,11 @@ int Polygonise(GRIDCELL grid, double isolevel, TRIANGLE *triangles)
 	if (grid.val[7] < isolevel) cubeindex |= 128;
 
 	/* Cube is entirely in/out of the surface */
-	//if (edgeTable[cubeindex] == 0)
-	//	grid.failed = true;
-	//	return(0);
+	if (edgeTable[cubeindex] == 0)
+	{
+		grid.failed = true;
+		return(0);
+	}
 
 	/* Find the vertices where the surface intersects the cube */
 	if (edgeTable[cubeindex] & 1)
@@ -436,9 +438,24 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	//}
 	std::thread m(&Terrain::terrainBuilder, this, _origin, _size, _scale);
 	m.join();
-	meshThreadGen();
 
-	
+	for (int i = 0; i < gridVec.size(); i++)
+	{
+		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
+		m_numPrims += newTris;
+		for (int Counter = 0; Counter < newTris; Counter++)
+		{
+			for (int m = 0; m < 3; m++)
+			{
+				myVertex newVert;
+				newVert.Pos = m_Triangles[Counter].p[m];
+				m_vertices.push_back(newVert);				//m_vertices is 1/3rd the size of gridVec -- need to either fix this or move functionality to myVertex - not sure which would be better, probably making sure everything in gridvec is put into m_vertices
+			}
+		}
+	}
+	meshThreadGen();
+	m_vertices.clear();
+	m_numPrims = 0;
 	for (int i = 0; i < gridVec.size(); i++)
 	{
 		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
@@ -501,7 +518,8 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	//if (numVerts != 0)
 	VBGO::BuildVB(_GD, numVerts, &m_vertices[0]);
-	VBGO::BuildSB(_GD, numVerts, &m_vertices[0]);
+	VBGO::m_numPrims = numVerts;
+	VBGO::BuildSB(_GD, m_numPrims, &m_vertices[0]);
 	//Rasterizer
 	D3D11_RASTERIZER_DESC raster;
 	raster.AntialiasedLineEnable = false;
@@ -579,8 +597,9 @@ void Terrain::Tick(GameData * _GD)
 	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	//if (numVerts != 0)
 	//BuildVB(dev, numVerts, &m_vertices[0]);
-	if (counter != 1)
-	{
+	//initial tick to move positions
+	//if (counter != 1)
+	//{
 		for (int i = 0; i < gridVec.size(); i++)
 		{
 			for (int r = 0; r < 8; r++)
@@ -588,8 +607,20 @@ void Terrain::Tick(GameData * _GD)
 				gridVec[i].p[r]->Tick(_GD);
 			}
 		}
-		counter++;
-	}
+		//counter++;
+	//}
+	/*else
+	{
+		for (int i = 0; i < gridVec.size(); i++)
+		{
+			for (int r = 0; r < 8; r++)
+			{
+				if (gridVec[i].p[r]->getisEroding() == true)
+					gridVec[i].p[r]->Tick(_GD);
+			}
+		}
+	}*/
+
 	VBGO::Tick(_GD);
 }
 //void Terrain::Draw(DrawData * _DD)
@@ -645,22 +676,25 @@ void Terrain::seamlessMesh(int startNum, int EndNum)
 {
 	for (int VecCounter = startNum; VecCounter < EndNum; VecCounter++)
 	{
-		for (int VecCounterB = startNum; VecCounterB < EndNum; VecCounterB++)
+		if (gridVec[VecCounter].failed != true)
 		{
-			for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
+			for (int VecCounterB = startNum; VecCounterB < EndNum; VecCounterB++)
 			{
-				for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
+				for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
 				{
+					for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
+					{
 						if (VecCounter != VecCounterB)
-						if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
-						{
-							gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
-							gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
-						}
+							if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+							{
+								gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
+								gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+							}
 					}
 				}
 			}
 		}
+	}
 }
 
 void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
@@ -671,6 +705,7 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 		{
 			for (int ZCounter = 0; ZCounter < _size.z; ZCounter++)
 			{
+				GRIDCELL m_Grid;
 				for (int i = 0; i < 8; i++)
 				{
 					//m.lock();
@@ -682,34 +717,11 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 					//m.unlock();
 				}
 				gridVec.push_back(m_Grid);
-				//ID3D11Buffer *pStructuredBuffer;
-				//D3D11_BUFFER_DESC sbDesc;
-				//sbDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
-				//sbDesc.CPUAccessFlags = 0;
-				//sbDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-				//sbDesc.StructureByteStride = sizeof(Vector4);
-				//sbDesc.ByteWidth = sizeof(Vector4) * gridVec.size();
-				//sbDesc.Usage = D3D11_USAGE_DEFAULT;
-
-				//gridHolder grid1;
-				//grid1.grid = gridVec;
-
-				//D3D11_SUBRESOURCE_DATA InitData;
-				//InitData.pSysMem = &grid1;
-				//InitData.SysMemPitch = 0;
-				//InitData.SysMemSlicePitch = 0;
-				//_GDStore->CreateBuffer(&sbDesc, &InitData, &pStructuredBuffer);
-				//gridVec.push_back(m_Grid);
-				//int numOfStrings = 2;
-				//for (int i = 0; i <= numOfStrings; i++)
-				//{
-				//int SizeofVec = gridVec.size();
-					//std::thread s(&Terrain::seamlessMesh, this, 0, gridVec.size());
-				//}
-				//std::thread t(&Terrain::seamlessMesh, this, 0, gridVec.size());
-				//if (t.joinable())
-				//t.join();
-				//s.join();
+				int newTris = Polygonise(m_Grid, m_isolevel, &m_Triangles[0]);
+				if (newTris == 0)
+				{
+					gridVec.pop_back();
+				}
 			}
 		}
 	}
@@ -718,19 +730,22 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 void Terrain::gapFiller(std::vector<int> gapVec, int num)
 {
 		int gapChecker = gapVec[num];
-		int calcNum = 150;
+		int calcNum = 60;
 		for (int VecCounter = gapChecker- calcNum; VecCounter < gapChecker+ calcNum; VecCounter++)
 		{
-			for (int VecCounterB = gapChecker - calcNum; VecCounterB < gapChecker + calcNum; VecCounterB++)
+			if (gridVec[VecCounter].failed != true)
 			{
-				for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
+				for (int VecCounterB = gapChecker - calcNum; VecCounterB < gapChecker + calcNum; VecCounterB++)
 				{
-					for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
+					for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
 					{
-						if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+						for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
 						{
-							gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
-							gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+							if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+							{
+								gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
+								gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+							}
 						}
 					}
 				}

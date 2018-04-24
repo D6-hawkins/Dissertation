@@ -12,9 +12,12 @@ public:
 
 	void Tick(GameData* _GD) override;
 	float getStrength() { return strength; };
+	void waterErode();
+	bool getisEroding() { return beingEroded; };
 private:
 	float strength;
-
+	GameData* GD;
+	bool beingEroded;
 
 };
 

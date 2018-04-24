@@ -64,7 +64,7 @@ VBGO::VBGO()
 	m_pSampler = nullptr;
 	m_pRasterState = nullptr;
 
-	m_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	m_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 
 	//NOTE WE DON'T CREATE ANYTHING HERE
 	//WHATEVER INHERITS THIS WILL DO THAT
@@ -165,7 +165,7 @@ void VBGO::Draw(DrawData* _DD)
 	ID3D11SamplerState* useSample = m_pSampler ? m_pSampler : s_pSampler;
 	_DD->m_pd3dImmediateContext->PSSetSamplers(0, 1, &useSample);
 	//and draw
-	_DD->m_pd3dImmediateContext->DrawIndexed(3 * m_numPrims, 0, 0);//number here will need to change depending on the primative topology!
+	_DD->m_pd3dImmediateContext->Draw(3 * m_numPrims, 0);//number here will need to change depending on the primative topology!
 }
 
 //--------------------------------------------------------------------------------------
@@ -317,7 +317,7 @@ void VBGO::Init(ID3D11Device* _GD)
 	//Setup Raster State
 	D3D11_RASTERIZER_DESC rasterDesc;
 	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_BACK;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
 	rasterDesc.DepthClipEnable = true;

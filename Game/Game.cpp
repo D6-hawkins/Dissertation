@@ -106,13 +106,15 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Marching Cubes
 	Terrain* Terr = new Terrain();
-	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(12.0f, 12.0f, 12.0f), 12, 12.0f*Vector3::One, _pd3dDevice);
+	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(50.0f, 50.0f, 50.0f), 1, 50.0f*Vector3::One, _pd3dDevice);
 	Terr->SetPos(Vector3(0,0,0));
 	Terr->SetPitch(-XM_PIDIV2);
 	Terr->SetScale(Vector3(3, 3, 3));
 	m_GameObjects.push_back(Terr);
 
 	Water* Wat = new Water();
+	Wat->init(Terr->getGridVec(), _pd3dDevice);
+	m_GameObjects.push_back(Wat);
 };
 
 
