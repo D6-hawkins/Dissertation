@@ -101,7 +101,9 @@ With Connection: 10.39s
 Without: N/A
 Changes: multiple threads mesh together the missing gaps now
 
-grid 1 - 0|750
-grid 2 - 750|1500
-grid 3 - 1500|2250
-grid 4 - 2250|3000
+
+16th Run: Found that most grid vector elements were not being rendered
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(50.0f, 50.0f, 50.0f), 1, 50.0f*Vector3::One, _pd3dDevice);
+With Connection: 17s
+Without: N/A
+Changes: stopped linking all elements that were not being rendered
