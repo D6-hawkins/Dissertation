@@ -18,7 +18,8 @@ private:
 	float strength;
 	GameData* GD;
 	bool beingEroded;
-
+	bool wasEroded;
+	bool mountain;
 };
 
 #endif // !_VOXEL_H_

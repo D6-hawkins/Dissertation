@@ -6,9 +6,11 @@ Voxel::Voxel(Vector3 _pos)
 	SetPos(_pos);
 	beingEroded = false;
 	//SetPhysicsOn(true);
-	int ranStren = rand() % 5 + 1;
+	int ranStren = rand() % 8 + 3;
 	//ranStren /= 10;
 	strength = ranStren;
+	wasEroded = false;
+	mountain = false;
 }
 
 void Voxel::Tick(GameData * _GD)
@@ -19,15 +21,15 @@ void Voxel::Tick(GameData * _GD)
 			float z = GetPos().z;
 			float y = GetPos().y;
 			float x = GetPos().x;
-			int randNum = rand() % 2 + 1;
+			int randNum = rand() % 6 + 1;
 			switch (randNum)
 			{
 			case 1: z -= 0.06f; break;
-			case 2: z += 0.07f; break;
-				//case 3: y -= 0.04f; break;
-				//case 4: y += 0.04f; break;
-				//case 5: x -= 0.04f; break;
-				//case 6: x += 0.04f; break;
+			case 2: z += 0.03f; break;
+			case 3: y -= 0.04f; break;
+			case 4: y += 0.04f; break;
+			case 5: x -= 0.04f; break;
+			case 6: x += 0.04f; break;
 
 			}
 			Vector3 pos = Vector3(x, y, z);
@@ -50,14 +52,15 @@ void Voxel::Tick(GameData * _GD)
 void Voxel::waterErode()
 {
 	beingEroded = true;
-	//if (strength >= 0)
-	//{
+	wasEroded = true;
+	if (strength >= 0)
+	{
 		float z = GetPos().z;
 		float y = GetPos().y;
 		float x = GetPos().x;
 
 		z -= 0.02f;
-		strength -= 0.04f;
+		strength -= 0.1f;
 		Vector3 pos = Vector3(x, y, z);
 		SetPos(pos);
 
@@ -67,6 +70,6 @@ void Voxel::waterErode()
 		Matrix  transMat = Matrix::CreateTranslation(pos);
 		m_worldMat = m_fudge * scaleMat * m_rotMat * transMat;
 		VBGO::Tick(GD);
-	//}
+	}
 
 }

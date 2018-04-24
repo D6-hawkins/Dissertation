@@ -76,12 +76,12 @@ void CMOGO::Draw(DrawData* _DD)
 	_DD->m_pd3dImmediateContext->PSSetShader(NULL, NULL, 0);
 	//pick up a copy of the current state...
 	_DD->m_pd3dImmediateContext->OMGetDepthStencilState(&DSS, &ref);
-	m_model->Draw(_DD->m_pd3dImmediateContext, *_DD->m_states, //graphics device and CommonStates reuqired by model system
-		m_worldMat, //world transform to poisiton this model in the world
-		_DD->m_cam->GetView(), _DD->m_cam->GetProj(), //veiw and projection matrix of the camera
-		false, //NO! I don't want wireframe
-		[&](){_DD->m_pd3dImmediateContext->RSSetState(s_pRasterState);} //this VERY weird construction creates a function on the fly to set up the render states correctly else the model system overrides them BADLY
-		);
+	////m_model->Draw(_DD->m_pd3dImmediateContext, *_DD->m_states, //graphics device and CommonStates reuqired by model system
+	//	m_worldMat, //world transform to poisiton this model in the world
+	//	_DD->m_cam->GetView(), _DD->m_cam->GetProj(), //veiw and projection matrix of the camera
+	//	false, //NO! I don't want wireframe
+	//	[&](){_DD->m_pd3dImmediateContext->RSSetState(s_pRasterState);} //this VERY weird construction creates a function on the fly to set up the render states correctly else the model system overrides them BADLY
+	//	);
 
 	//...and put the depth stencil state back again
 	_DD->m_pd3dImmediateContext->OMSetDepthStencilState(DSS, ref);

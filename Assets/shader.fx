@@ -51,8 +51,15 @@ PS_INPUT VS( VS_INPUT input )
 	output.worldPos = mul(input.Pos, World);
     output.Pos = mul( output.worldPos, View );
 	output.Pos = mul( output.Pos, Projection );
+	if (output.worldPos.y < 1.5)
+	{
+		output.Color = float4(0.0f, 0.0f, 1.0f, 1.0f);
+	}
+	else
+	{
+		output.Color = input.Color;
+	}
     output.Norm = mul( input.Norm, rot );
-    output.Color = input.Color;
 	output.texCoord = input.texCoord;
     return output;
 }

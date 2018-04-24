@@ -18,7 +18,9 @@ public:
 	void setGrounded(bool val) { grounded = val; };
 	bool isGrounded() { return grounded; };
 	void getrandomGrid();
+	void moveGridNum();
 private:
+	int counter = 0;
 	int waterPosStart;
 	std::vector<GRIDCELL> gridVec;
 	bool isAlive;
@@ -26,6 +28,9 @@ private:
 	bool grounded;
 	myVertex* m_vertices;
 	float fallSpeed;
+	bool riverFormed = false;
+	int tickCounter = 0;
+	int mountainCounter = 0;
 };
 
 #endif

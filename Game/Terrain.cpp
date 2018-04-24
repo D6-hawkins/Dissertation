@@ -598,8 +598,8 @@ void Terrain::Tick(GameData * _GD)
 	//if (numVerts != 0)
 	//BuildVB(dev, numVerts, &m_vertices[0]);
 	//initial tick to move positions
-	//if (counter != 1)
-	//{
+	/*if (counter != 300)
+	{
 		for (int i = 0; i < gridVec.size(); i++)
 		{
 			for (int r = 0; r < 8; r++)
@@ -607,8 +607,8 @@ void Terrain::Tick(GameData * _GD)
 				gridVec[i].p[r]->Tick(_GD);
 			}
 		}
-		//counter++;
-	//}
+		counter++;
+	}*/
 	/*else
 	{
 		for (int i = 0; i < gridVec.size(); i++)
@@ -623,16 +623,10 @@ void Terrain::Tick(GameData * _GD)
 
 	VBGO::Tick(_GD);
 }
-//void Terrain::Draw(DrawData * _DD)
-//{
-//	VBGO::Draw(_DD);
-//}
-//
 void Terrain::Draw(DrawData * _DD)
 {
 	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, indices, 0, 0);
 	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
-	//_DD->m_pd3dImmediateContext->UpdateSubresource(m_StreamBuffer, 0, NULL, &m_vertices[0], 0, 0);
 	VBGO::Draw(_DD);
 }
 
@@ -640,38 +634,6 @@ void Terrain::Remake()
 {
 
 }
-
-//void Terrain::seamlessMesh(GRIDCELL)
-//{
-//}
-
-//void Terrain::Sorter(std::vector<GRIDCELL> b) //METHOD 5
-//{
-//	for (int VecCounter = 0; VecCounter < b.size(); VecCounter++)
-//	{
-//		for (int VecCounterB = 0; VecCounterB < b.size(); VecCounterB++)
-//		{
-//			for (int GridElem = 0; GridElem < b[VecCounter].size; GridElem++)
-//			{
-//				for (int GridElemB = 0; GridElemB < b[VecCounter].size; GridElemB++)
-//				{
-//					if (b[VecCounterB].beenChecked == false)
-//					{
-//						if (b[VecCounter].p[GridElem]->GetPos() == b[VecCounterB].p[GridElemB]->GetPos())
-//						{
-//							b[VecCounter].p[GridElem] = b[VecCounterB].p[GridElemB];
-//							b[VecCounter].val[GridElem] = b[VecCounterB].val[GridElemB];
-//						}
-//					}
-//				}
-//			}
-//		}
-//		b[VecCounter].beenChecked = true;
-//		gridVec.push_back(b[VecCounter]);
-//	}
-//
-//}
-
 void Terrain::seamlessMesh(int startNum, int EndNum)
 {
 	for (int VecCounter = startNum; VecCounter < EndNum; VecCounter++)
@@ -726,7 +688,7 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 		}
 	}
 }
-//140
+
 void Terrain::gapFiller(std::vector<int> gapVec, int num)
 {
 		int gapChecker = gapVec[num];
@@ -782,28 +744,16 @@ void Terrain::meshThreadGen()
 	std::thread filler2(&Terrain::gapFiller, this, gaps, 1);
 	std::thread filler3(&Terrain::gapFiller, this, gaps, 2);
 	std::thread filler4(&Terrain::gapFiller, this, gaps, 3);
-	//////here
 	std::thread filler5(&Terrain::gapFiller, this, gaps, 4);
-	//std::thread filler6(&Terrain::gapFiller, this, gaps, 5);
-	////std::thread filler7(&Terrain::gapFiller, this, gaps, 6);
-	////std::thread filler8(&Terrain::gapFiller, this, gaps, 7);
-	////std::thread filler9(&Terrain::gapFiller, this, gaps, 8);
 	filler1.join();
 	filler2.join();
 	filler3.join();
 	filler4.join();
 	filler5.join();
-	//filler6.join();
-	//filler7.join();
-	//filler8.join();
-	//filler9.join();
 }
 
 float Terrain::PosChanger(Vector3 _pos, int i)
 {
-	//float  z = 0.2f*_pos.z, x = 0.2f* _pos.x, y = 0.2f* _pos.y;
-	//return (sin(x * 35) * sin(y*35) * sin(z*35));
 	float z = _pos.z;
-	//float z = _pos->GetPos().z;
 	return z;
 }
