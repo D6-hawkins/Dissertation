@@ -3,12 +3,14 @@
 #include "VBGO.h"
 #include "vertex.h"
 #include "GameData.h"
+#include <vector>
+#include "gridcell.h"
 class Water : public VBGO
 {
 public:
 	Water();
 	virtual ~Water() {};
-	void init(Vector3 _pos, ID3D11Device* _GD);
+	void init(std::vector<GRIDCELL> gridVec, ID3D11Device* _GD);
 
 	virtual void Tick(GameData* _GD) override;
 	float getErode();

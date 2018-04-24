@@ -76,3 +76,32 @@ Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(20.0f, 20.0f, 20.0f), 0.01
 With Connection: over 1min 15 seconds - stopped the loading there.
 Without: 01.73s
 Changes: both threaded, if joinable removed
+
+14th Run: before more threads - method 4 in thread
+Values: 	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(11.0f, 11.0f, 11.0f), 11, 11.0f*Vector3::One, _pd3dDevice);
+With Connection: 1:27mins
+Without: 01.73s
+Changes: both threaded, if joinable removed
+
+15th Run: more threads added - method 4 being used
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(11.0f, 11.0f, 11.0f), 11, 11.0f*Vector3::One, _pd3dDevice);
+With Connection: 10.39s
+Without: N/A
+Changes: Multiple threads mesh together - gaps between seperate meshing currents showing
+
+15th Run: gap filling function has been added
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(11.0f, 11.0f, 11.0f), 11, 11.0f*Vector3::One, _pd3dDevice);
+With Connection: 17.16s
+Without: N/A
+Changes: added an additional thread that combines the previously missed vertices
+
+16th Run: threaded the gap filling function
+Values: Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(11.0f, 11.0f, 11.0f), 11, 11.0f*Vector3::One, _pd3dDevice);
+With Connection: 10.39s
+Without: N/A
+Changes: multiple threads mesh together the missing gaps now
+
+grid 1 - 0|750
+grid 2 - 750|1500
+grid 3 - 1500|2250
+grid 4 - 2250|3000

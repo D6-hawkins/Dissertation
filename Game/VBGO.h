@@ -30,6 +30,7 @@ protected:
 	ID3D11Buffer* m_VertexBuffer;
 	ID3D11Buffer* m_IndexBuffer;
 	ID3D11Buffer* m_StreamBuffer;
+	ID3D11Buffer* m_OutputBuffer;
 	//ID3D11Buffer* m_StreamBuffer;
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
 	UINT m_numPrims;
@@ -47,9 +48,10 @@ protected:
 	static ID3D11GeometryShader* s_pGeometryShader;
 	static ID3D11ShaderResourceView* s_pTextureRV;
 	static ID3D11ShaderResourceView* s_pBufferRV;
+	static ID3D11UnorderedAccessView* s_pUAV;
 	//deafult const buffer
 	static ID3D11Buffer*           s_pConstantBuffer;	//GPU side
-	static ID3D11Buffer*		   s_pStreamBuffer;
+	//static ID3D11Buffer*		   s_pStreamBuffer;
 	static ConstantBuffer*			s_pCB;				//CPU side
 	//default sampler
 	static ID3D11SamplerState*		s_pSampler;
@@ -73,6 +75,9 @@ protected:
 	ID3D11ShaderResourceView* m_pTextureRV;
 
 	ID3D11ShaderResourceView* m_pBufferRV;
+
+	ID3D11UnorderedAccessView* m_pUAV;
+
 	//my const buffer
 	ID3D11Buffer*           m_pConstantBuffer; //GPU side
 	void*					m_pCB;//CPU side

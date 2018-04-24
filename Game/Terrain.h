@@ -9,6 +9,7 @@
 #include "DrawData.h"
 #include <mutex>
 #include <thread>
+#include <stdlib.h>
 class Voxel;
 typedef Vector3 XYZ;
 typedef struct {
@@ -30,13 +31,17 @@ public:
 	Vector3 getScale() { return m_scale; };
 	Vector3 getSize() { return m_size; };
 	std::vector<myVertex> getvert() { return m_vertices; };
-	void seamlessMesh();
+	void seamlessMesh(int startNum, int endNum);
 	//void Sorter(std::vector <GRIDCELL>);
 	void terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale);
 	std::vector <GRIDCELL> gridVec;
 	bool getShouldBeShader() { return ShaderCode;};
+	void gapFiller(std::vector<int> gapVec, int);
+	void meshThreadGen();
 protected:
 	bool ShaderCode = true;
+	int numOfThreads;
+	std::vector<int> gaps;
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
 	std::vector<myVertex> m_vertices;
@@ -55,6 +60,8 @@ protected:
 	std::mutex m;
 	ID3D11Device* _GDStore;
 	int* indices;
+	int startVal;
+	int startValRem;
 	//int* indices;
 	//std::thread t;
 	//std::thread m;

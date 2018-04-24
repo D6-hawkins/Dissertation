@@ -24,13 +24,15 @@ ID3D11PixelShader*			VBGO::s_pPixelShader = nullptr;
 ID3D11ShaderResourceView*	VBGO::s_pTextureRV = nullptr;
 
 ID3D11ShaderResourceView*	VBGO::s_pBufferRV = nullptr;
+
+ID3D11UnorderedAccessView* VBGOs_pUAV = nullptr;
 //default geometry shader
 ID3D11GeometryShader*		VBGO::s_pGeometryShader = nullptr;
 //deafult const buffer
 //GPU side
 ID3D11Buffer*				VBGO::s_pConstantBuffer = nullptr;
 
-ID3D11Buffer*				VBGO::s_pStreamBuffer = nullptr;
+
 //ComputeShader
 ID3D11ComputeShader*		VBGO::s_pComputeShader = nullptr;
 //CPU side	
@@ -57,6 +59,7 @@ VBGO::VBGO()
 	m_pTextureRV = nullptr;
 	m_pConstantBuffer = nullptr;
 	m_pBufferRV = nullptr;
+	m_pUAV = nullptr;
 	m_pCB = nullptr;
 	m_pSampler = nullptr;
 	m_pRasterState = nullptr;
@@ -93,6 +96,7 @@ void VBGO::Tick(GameData* _GD)
 void VBGO::Draw(DrawData* _DD)
 {
 	//if (m_VertexBuffer != NULL)
+	//_DD->m_pd3dImmediateContext->CopyResource(m_VertexBuffer, m_StreamBuffer);
 	//_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, NULL, NULL, m_StreamBuffer, NULL, NULL);
 	//set raster state
 	ID3D11RasterizerState* useRasterS = m_pRasterState ? m_pRasterState : s_pRasterState;
@@ -117,7 +121,7 @@ void VBGO::Draw(DrawData* _DD)
 	_DD->m_pd3dImmediateContext->UpdateSubresource(useCB, 0, NULL, useCBData, 0, 0);
 	_DD->m_pd3dImmediateContext->VSSetConstantBuffers(0, 1, &useCB);
 	_DD->m_pd3dImmediateContext->PSSetConstantBuffers(0, 1, &useCB);
-	_DD->m_pd3dImmediateContext->CSSetConstantBuffers(0, 1, &useCB);
+	//_DD->m_pd3dImmediateContext->CSSetConstantBuffers(0, 1, &useCB);
 	//_DD->m_pd3dImmediateContext->GSSetConstantBuffers(0, 1, &useCB);
 	//unless it has it own set them to the static defaults
 	//set  vertex layout
@@ -133,13 +137,16 @@ void VBGO::Draw(DrawData* _DD)
 	ID3D11PixelShader* usePS = m_pPixelShader ? m_pPixelShader : s_pPixelShader;
 	_DD->m_pd3dImmediateContext->PSSetShader(usePS, NULL, 0);
 
-	//set compute shader
-	ID3D11ComputeShader* useCS = m_pComputeShader ? m_pComputeShader : s_pComputeShader;
-	_DD->m_pd3dImmediateContext->CSSetShader(useCS, NULL, 0);
-	ID3D11ShaderResourceView* useB = m_pBufferRV ? m_pBufferRV : s_pBufferRV;
-	_DD->m_pd3dImmediateContext->CSSetShaderResources(0, 1, &useB);
-	_DD->m_pd3dImmediateContext->Dispatch(32, 21, 1);
-	_DD->m_pd3dImmediateContext->CSSetShader(NULL, NULL, 0);
+	////set compute shader
+	//ID3D11UnorderedAccessView* ppUAVViewNULL[1] = { NULL };
+	//ID3D11ShaderResourceView* ppSRVNULL[2] = { NULL, NULL };
+	//ID3D11ComputeShader* useCS = m_pComputeShader ? m_pComputeShader : s_pComputeShader;
+	//_DD->m_pd3dImmediateContext->CSSetShader(useCS, NULL, 0);
+
+	//_DD->m_pd3dImmediateContext->CSSetShaderResources(0, 1, &m_pBufferRV);
+	//_DD->m_pd3dImmediateContext->CSSetUnorderedAccessViews(0, 1, &m_pUAV, NULL);
+	//_DD->m_pd3dImmediateContext->Dispatch(32, 21, 1);
+	//_DD->m_pd3dImmediateContext->CSSetShader(NULL, NULL, 0);
 	////Set Geometery shader
 	//if (t < 1)
 	//{
@@ -227,30 +234,30 @@ void VBGO::Init(ID3D11Device* _GD)
 		"EXAMPLE_DEFINE", "1",
 		NULL, NULL
 	};
-	//default Compute Shader
-	ID3DBlob* shaderBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-	//hr = CompileShaderFromFile(L"../Assets/terrainShader.fx", "CS", "cs_5_1", &shaderBlob);
-	hr = CompileShaderFromFile(L"../GAme/terrainShader.fx", "CSMain", "cs_5_0", &shaderBlob);
-	//hr = D3DCompileFromFile(L"../Game/terrainShader.fx", defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "CSMain", profile, flags, 0, &shaderBlob, &errorBlob);
-	//if (FAILED(hr))
-	//{
-	//	if (errorBlob)
-	//	{
-	//		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-	//		errorBlob->Release();
-	//	}
+	////default Compute Shader
+	////ID3DBlob* shaderBlob = nullptr;
+	////ID3DBlob* errorBlob = nullptr;
+	////hr = CompileShaderFromFile(L"../Assets/terrainShader.fx", "CS", "cs_5_1", &shaderBlob);
+	////hr = CompileShaderFromFile(L"../GAme/terrainShader.fx", "CSMain", "cs_5_0", &shaderBlob);
+	////hr = D3DCompileFromFile(L"../Game/terrainShader.fx", defines, D3D_COMPILE_STANDARD_FILE_INCLUDE, "CSMain", profile, flags, 0, &shaderBlob, &errorBlob);
+	////if (FAILED(hr))
+	////{
+	////	if (errorBlob)
+	////	{
+	////		OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+	////		errorBlob->Release();
+	////	}
 
-	//	if (shaderBlob)
-	//		shaderBlob->Release();
+	////	if (shaderBlob)
+	////		shaderBlob->Release();
 
-	//	//return hr;
-	//}
+	////	//return hr;
+	////}
 
-	/**blob = shaderBlob;
+	/////**blob = shaderBlob;
 
-	return hr;*/
-	_GD->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), NULL, &s_pComputeShader);
+	////return hr;*/
+	////_GD->CreateComputeShader(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), NULL, &s_pComputeShader);
 
 	//default geometry shader
 
@@ -267,18 +274,18 @@ void VBGO::Init(ID3D11Device* _GD)
 #endif
 	//OUTPUT BUFFER
 	//structures from creating buffers
-	int m_nBufferSize = 1000000;
+	//int m_nBufferSize = 1000000;
 
-	D3D11_BUFFER_DESC bufferDesc =
-	{
-		m_nBufferSize,
-		D3D11_USAGE_DEFAULT,
-		D3D11_BIND_STREAM_OUTPUT,
-		0,
-		0,
-		0
-	};
-	_GD->CreateBuffer(&bufferDesc, NULL, &s_pStreamBuffer);
+	//D3D11_BUFFER_DESC bufferDesc =
+	//{
+	//	m_nBufferSize,
+	//	D3D11_USAGE_DEFAULT,
+	//	D3D11_BIND_STREAM_OUTPUT,
+	//	0,
+	//	0,
+	//	0
+	//};
+	//_GD->CreateBuffer(&bufferDesc, NULL, &s_pStreamBuffer);
 	//deafult const buffer
 	//GPU side
 	D3D11_BUFFER_DESC bd;
@@ -347,7 +354,6 @@ void VBGO::CleanUp()
 	DESTROY(s_pConstantBuffer);
 	DESTROY(s_pComputeShader);
 	DESTROY(s_pGeometryShader);
-	DESTROY(s_pStreamBuffer);
 	if (s_pCB)
 	{
 		delete s_pCB;
@@ -394,42 +400,72 @@ void VBGO::BuildVB(ID3D11Device* _GD, int _numVerts, void* _vertices)
 }
 void VBGO::BuildSB(ID3D11Device* _GD, int _numVerts, void* _vertices)
 {
-	////////OUTPUT BUFFER
-	////////structures from creating buffers
-	//D3D11_BUFFER_DESC bd;
+	//////////OUTPUT BUFFER
+	//////////structures from creating buffers
+	////D3D11_BUFFER_DESC bd;
+	////D3D11_SUBRESOURCE_DATA InitData;
+	////HRESULT hr = S_OK;
+
+	//////build vertex buffer
+	////ZeroMemory(&bd, sizeof(bd));
+	////bd.Usage = D3D11_USAGE_DEFAULT;
+	////bd.ByteWidth = sizeof(myVertex) * _numVerts;
+	////bd.BindFlags = D3D11_BIND_STREAM_OUTPUT;
+	////bd.CPUAccessFlags = 0;
+	////ZeroMemory(&InitData, sizeof(InitData));
+	////InitData.pSysMem = _vertices;
+	////hr = _GD->CreateBuffer(&bd, &InitData, &m_StreamBuffer);
+
+	//D3D11_BUFFER_DESC descGPUBuffer;
+	//ZeroMemory(&descGPUBuffer, sizeof(descGPUBuffer));
+	//descGPUBuffer.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+	//descGPUBuffer.ByteWidth = sizeof(myVertex) * _numVerts;
+	////descGPUBuffer.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+
 	//D3D11_SUBRESOURCE_DATA InitData;
-	//HRESULT hr = S_OK;
-
-	////build vertex buffer
-	//ZeroMemory(&bd, sizeof(bd));
-	//bd.Usage = D3D11_USAGE_DEFAULT;
-	//bd.ByteWidth = sizeof(myVertex) * _numVerts;
-	//bd.BindFlags = D3D11_BIND_STREAM_OUTPUT;
-	//bd.CPUAccessFlags = 0;
-	//ZeroMemory(&InitData, sizeof(InitData));
 	//InitData.pSysMem = _vertices;
-	//hr = _GD->CreateBuffer(&bd, &InitData, &m_StreamBuffer);
-
-	D3D11_BUFFER_DESC descGPUBuffer;
-	ZeroMemory(&descGPUBuffer, sizeof(descGPUBuffer));
-	descGPUBuffer.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
-	descGPUBuffer.ByteWidth = sizeof(myVertex) * _numVerts;
-	//descGPUBuffer.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-
-	D3D11_SUBRESOURCE_DATA InitData;
-	InitData.pSysMem = _vertices;
-	_GD->CreateBuffer(&descGPUBuffer, &InitData, &m_StreamBuffer);
+	//_GD->CreateBuffer(&descGPUBuffer, &InitData, &m_StreamBuffer);
 
 	//D3D11_BUFFER_DESC descBuf;
 	//ZeroMemory(&descBuf, sizeof(descBuf));
 	//m_StreamBuffer->GetDesc(&descBuf);
 
-	//D3D11_SHADER_RESOURCE_VIEW_DESC descView;
+	//D3D11_SHADER_RESOURCE_VIEW_DESC descView2;
+	//ZeroMemory(&descView2, sizeof(descView2));
+	//descView2.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+	//descView2.Buffer.FirstElement = 0;
+
+	//descView2.Format = DXGI_FORMAT_UNKNOWN;
+	//descView2.Buffer.NumElements = descBuf.ByteWidth;
+	//_GD->CreateShaderResourceView(m_StreamBuffer, &descView2, &m_pBufferRV);
+	////D3D11_BUFFER_DESC descBuf;
+	////ZeroMemory(&descBuf, sizeof(descBuf));
+	////m_StreamBuffer->GetDesc(&descBuf);
+
+	////D3D11_SHADER_RESOURCE_VIEW_DESC descView;
+	////ZeroMemory(&descView, sizeof(descView));
+	////descView.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
+	////descView.BufferEx.FirstElement = 0;
+
+	////descView.Format = DXGI_FORMAT_UNKNOWN;
+	////descView.BufferEx.NumElements = descBuf.ByteWidth / descBuf.StructureByteStride;
+	////_GD->CreateShaderResourceView(m_StreamBuffer, &descView, )
+	//D3D11_BUFFER_DESC descGPUBuffer2;
+	//ZeroMemory(&descGPUBuffer2, sizeof(descGPUBuffer2));
+	//descGPUBuffer2.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+	//descGPUBuffer2.ByteWidth = sizeof(myVertex) * _numVerts;
+	//_GD->CreateBuffer(&descGPUBuffer2, NULL, &m_OutputBuffer);
+
+	//D3D11_BUFFER_DESC descBuf2;
+	//ZeroMemory(&descBuf2, sizeof(descBuf2));
+	//m_OutputBuffer->GetDesc(&descBuf2);
+
+	//D3D11_UNORDERED_ACCESS_VIEW_DESC descView;
 	//ZeroMemory(&descView, sizeof(descView));
-	//descView.ViewDimension = D3D11_SRV_DIMENSION_BUFFEREX;
-	//descView.BufferEx.FirstElement = 0;
+	//descView.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	//descView.Buffer.FirstElement = 0;
 
 	//descView.Format = DXGI_FORMAT_UNKNOWN;
-	//descView.BufferEx.NumElements = descBuf.ByteWidth / descBuf.StructureByteStride;
-	//_GD->CreateShaderResourceView(m_StreamBuffer, &descView, )
+	//descView.Buffer.NumElements = descBuf2.ByteWidth;
+	//_GD->CreateUnorderedAccessView(m_OutputBuffer, &descView, &m_pUAV);
 }

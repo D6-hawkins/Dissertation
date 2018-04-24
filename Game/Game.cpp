@@ -106,28 +106,13 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 
 	//Marching Cubes
 	Terrain* Terr = new Terrain();
-	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(11.0f, 11.0f, 11.0f), 11, 11.0f*Vector3::One, _pd3dDevice);
+	Terr->Init(Vector3(0.0f, 0.0f, 0.0f), Vector3(12.0f, 12.0f, 12.0f), 12, 12.0f*Vector3::One, _pd3dDevice);
 	Terr->SetPos(Vector3(0,0,0));
 	Terr->SetPitch(-XM_PIDIV2);
 	Terr->SetScale(Vector3(3, 3, 3));
 	m_GameObjects.push_back(Terr);
 
-	WaterManager* waterManager = new WaterManager();
-	waterManager->Init(Terr->getGridVec(), "BirdModelV1.cmo", _pd3dDevice, m_fxFactory, m_TPScam);
-	waterManager->setDevice(_pd3dDevice);
-	m_GameObjects.push_back(waterManager);
-	//Terrain* Terr2 = new Terrain();
-	//Terr2->Init(Vector3(10.0f, 10.0f, 13.0f), Vector3(0.0f, 0.0f, 0.0f), 0.01, 60.0f*Vector3::One, _pd3dDevice);
-	//Terr2->SetPos(Vector3(0, 0, 0));
-	//Terr2->SetPitch(XM_PIDIV2);
-	//Terr2->SetScale(Vector3(3, 3, 1.5));
-	//m_GameObjects.push_back(Terr2);
-	//VBMarchCubes* VBMC = new VBMarchCubes();
-	//VBMC->init(Vector3(-8.0f, -8.0f, -17.0f) /* Min */, Vector3(8.0f, 8.0f,23.0f) /* Max */, 60.0f*Vector3::One /* size */, 0.01 /* Isolevel */, _pd3dDevice /* GD */);
-	//VBMC->SetPos(Vector3(100,0,-100));
-	//VBMC->SetPitch(-XM_PIDIV2);
-	//VBMC->SetScale(Vector3(3, 3, 1.5));
-	//m_GameObjects.push_back(VBMC);
+	Water* Wat = new Water();
 };
 
 

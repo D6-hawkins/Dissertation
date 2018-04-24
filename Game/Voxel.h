@@ -11,8 +11,9 @@ public:
 	virtual ~Voxel() {};
 
 	void Tick(GameData* _GD) override;
+	float getStrength() { return strength; };
 private:
-
+	float strength;
 
 
 };

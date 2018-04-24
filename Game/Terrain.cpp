@@ -430,102 +430,15 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	m_numPrims = 0;
 	m_isolevel = isolevel;
 	_GDStore = _GD;
+	//for (int i = 0; i < gridVec.size(); i++)
+	//{
+	//	gridVec[i] = GRIDCELL*;
+	//}
 	std::thread m(&Terrain::terrainBuilder, this, _origin, _size, _scale);
 	m.join();
-	//here
+	meshThreadGen();
 
-
-
-
-	//std::thread t(&Terrain::seamlessMesh, this);
-		//for (int XCounter = 0; XCounter < _size.x; XCounter++)
-		//{
-		//	for (int YCounter = 0; YCounter < _size.y; YCounter++)
-		//	{
-		//		for (int ZCounter = 0; ZCounter < _size.z; ZCounter++)
-		//		{
-		//			for (int i = 0; i < 8; i++)
-		//			{
-		//				m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
-		//				m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
-		//				m_Grid.size = 7;
-		//			}
-		//			gridVec.push_back(m_Grid);
-		//			//METHOD 1
-		//			//for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
-		//			//{
-		//			//	for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
-		//			//	{
-		//			//		for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
-		//			//		{
-		//			//			if (m_Grid.p[GridC]->GetPos() == gridVec[vecC].p[innerVecC]->GetPos()) //If any of the positions of the new grid positions match existing positions
-		//			//			{
-		//			//				m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
-		//			//				m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
-		//			//			}
-		//			//		}
-		//			//	}
-		//			//}
-		////			//METHOD 3
-		////			for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
-		////			{
-		////				for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
-		////				{
-		////					for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
-		////					{
-		////						if (gridVec[vecC].p[innerVecC]->GetPos() == m_Grid.p[GridC]->GetPos()) //If any of the positions of the new grid positions match existing positions
-		////						{
-		////							m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
-		////							m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
-		////						}
-		////					}
-		////				}
-		////			}
-		//		}
-		//	}
-		//}
-		//seamlessMesh();
-		////METHOD 2
-		//for (int VecCounter = 0; VecCounter < gridVec.size(); VecCounter++)
-		//{
-		//	for (int VecCounterB = 0; VecCounterB < gridVec.size(); VecCounterB++)
-		//	{
-		//		for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
-		//		{
-		//			for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
-		//			{
-		//				if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
-		//				{
-		//					gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
-		//					gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-		//METHOD 4
-		//for (int VecCounter = 0; VecCounter < gridVec.size(); VecCounter++)
-		//{
-		//	for (int VecCounterB = 0; VecCounterB < gridVec.size(); VecCounterB++)
-		//	{
-		//		for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
-		//		{
-		//			for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
-		//			{
-		//				if (gridVec[VecCounterB].beenChecked == false)
-		//				{
-		//					if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
-		//					{
-		//						gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
-		//						gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
-		//	gridVec[VecCounter].beenChecked = true;
-		//}
-	//m_numPrims = 0;
+	
 	for (int i = 0; i < gridVec.size(); i++)
 	{
 		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
@@ -666,7 +579,7 @@ void Terrain::Tick(GameData * _GD)
 	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
 	//if (numVerts != 0)
 	//BuildVB(dev, numVerts, &m_vertices[0]);
-	if (counter != 30)
+	if (counter != 1)
 	{
 		for (int i = 0; i < gridVec.size(); i++)
 		{
@@ -687,7 +600,7 @@ void Terrain::Tick(GameData * _GD)
 void Terrain::Draw(DrawData * _DD)
 {
 	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, indices, 0, 0);
-	//_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
+	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
 	//_DD->m_pd3dImmediateContext->UpdateSubresource(m_StreamBuffer, 0, NULL, &m_vertices[0], 0, 0);
 	VBGO::Draw(_DD);
 }
@@ -728,36 +641,26 @@ void Terrain::Remake()
 //
 //}
 
-void Terrain::seamlessMesh()
+void Terrain::seamlessMesh(int startNum, int EndNum)
 {
-	for (int vecC = 0; vecC < gridVec.size(); vecC++) //For each vector element
+	for (int VecCounter = startNum; VecCounter < EndNum; VecCounter++)
 	{
-		for (int innerVecC = 0; innerVecC < gridVec[vecC].size; innerVecC++) //For each 8 elements inside the vector
+		for (int VecCounterB = startNum; VecCounterB < EndNum; VecCounterB++)
 		{
-			for (int GridC = 0; GridC < m_Grid.size; GridC++) //For Each Grid Element
+			for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
 			{
-				//if (gridVec[vecC].failed == false)
-				if (gridVec[vecC].p[innerVecC]->GetPos() == m_Grid.p[GridC]->GetPos()) //If any of the positions of the new grid positions match existing positions
+				for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
 				{
-					m_Grid.p[GridC] = gridVec[vecC].p[innerVecC];
-					m_Grid.val[GridC] = gridVec[vecC].val[innerVecC];
+						if (VecCounter != VecCounterB)
+						if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+						{
+							gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
+							gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+						}
+					}
 				}
 			}
 		}
-		//gridVec[vecC].failed = true;
-	}
-	//for (int gridCounter = 0; gridCounter < m_Grid.size; gridCounter++)
-	//{
-	//	for (int vecCounter = 0; vecCounter < gridVec.size(); vecCounter++)
-	//	{
-	//		for (int insideGrid = 0; insideGrid < gridVec[vecCounter].size; insideGrid++)
-	//		{
-	//			m_Grid.p[insideGrid] = gridVec[gridCounter].p[vecCounter];
-	//			m_Grid.val[insideGrid] = gridVec[gridCounter].val[vecCounter];
-	//		}
-	//	}
-	//}
-	//gridVec.push_back(m_Grid);
 }
 
 void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
@@ -797,12 +700,88 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 				//InitData.SysMemSlicePitch = 0;
 				//_GDStore->CreateBuffer(&sbDesc, &InitData, &pStructuredBuffer);
 				//gridVec.push_back(m_Grid);
-				//std::thread t(&Terrain::seamlessMesh, this);
-				////if (t.joinable())
+				//int numOfStrings = 2;
+				//for (int i = 0; i <= numOfStrings; i++)
+				//{
+				//int SizeofVec = gridVec.size();
+					//std::thread s(&Terrain::seamlessMesh, this, 0, gridVec.size());
+				//}
+				//std::thread t(&Terrain::seamlessMesh, this, 0, gridVec.size());
+				//if (t.joinable())
 				//t.join();
+				//s.join();
 			}
 		}
 	}
+}
+//140
+void Terrain::gapFiller(std::vector<int> gapVec, int num)
+{
+		int gapChecker = gapVec[num];
+		int calcNum = 150;
+		for (int VecCounter = gapChecker- calcNum; VecCounter < gapChecker+ calcNum; VecCounter++)
+		{
+			for (int VecCounterB = gapChecker - calcNum; VecCounterB < gapChecker + calcNum; VecCounterB++)
+			{
+				for (int GridElem = 0; GridElem < gridVec[VecCounter].size; GridElem++)
+				{
+					for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
+					{
+						if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+						{
+							gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
+							gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
+						}
+					}
+				}
+			}
+		}
+}
+
+void Terrain::meshThreadGen()
+{
+	div_t divresult;
+	numOfThreads = 6;
+	divresult = div(gridVec.size(), numOfThreads);
+	startVal = divresult.quot;
+	startValRem = divresult.quot + divresult.rem;
+	int calc = startValRem - startVal;
+	gaps.push_back(startVal);
+	gaps.push_back(startVal * 2);
+	gaps.push_back(startVal * 3);
+	gaps.push_back(startVal * 4);
+	gaps.push_back(startVal * 5);
+	std::thread grid1(&Terrain::seamlessMesh, this, 0, startVal);
+	std::thread grid2(&Terrain::seamlessMesh, this, startVal+1, startVal*2);
+	std::thread grid3(&Terrain::seamlessMesh, this, startVal * 2 +1, startVal*3);
+	std::thread grid4(&Terrain::seamlessMesh, this, startVal*3 + 1, startVal*4);
+	std::thread grid5(&Terrain::seamlessMesh, this, startVal * 4 + 1, startVal * 5);
+	std::thread grid6(&Terrain::seamlessMesh, this, startVal * 5 + 1, gridVec.size());
+	grid1.join();
+	grid2.join();
+	grid3.join();
+	grid4.join();
+	grid5.join();
+	grid6.join();
+	std::thread filler1(&Terrain::gapFiller, this, gaps, 0);
+	std::thread filler2(&Terrain::gapFiller, this, gaps, 1);
+	std::thread filler3(&Terrain::gapFiller, this, gaps, 2);
+	std::thread filler4(&Terrain::gapFiller, this, gaps, 3);
+	//////here
+	std::thread filler5(&Terrain::gapFiller, this, gaps, 4);
+	//std::thread filler6(&Terrain::gapFiller, this, gaps, 5);
+	////std::thread filler7(&Terrain::gapFiller, this, gaps, 6);
+	////std::thread filler8(&Terrain::gapFiller, this, gaps, 7);
+	////std::thread filler9(&Terrain::gapFiller, this, gaps, 8);
+	filler1.join();
+	filler2.join();
+	filler3.join();
+	filler4.join();
+	filler5.join();
+	//filler6.join();
+	//filler7.join();
+	//filler8.join();
+	//filler9.join();
 }
 
 float Terrain::PosChanger(Vector3 _pos, int i)

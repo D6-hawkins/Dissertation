@@ -24,7 +24,7 @@ void WaterManager::Tick(GameData * _GD)
 		//Vector3 worldPos;
 		//worldPos.Transform(Vector3(_GD->m_mouseState->lX, _GD->m_mouseState->lY, _GD->m_mouseState->lZ), m_camStore->GetView());
 		Water* water = new Water();
-		water->init(MousePos, GD);
+		//water->init(MousePos, GD);
 		waterVec.push_back(water);
 	}
 	currentTime += currentTime * _GD->m_dt;

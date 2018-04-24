@@ -1,3 +1,13 @@
+cbuffer ConstantBuffer : register(b0)
+{
+	matrix World;
+	matrix View;
+	matrix Projection;
+	matrix rot;
+	float4 lightCol;
+	float4 ambientCol;
+	float3 lightPos;
+}
 //struct GS_OUTPUT
 //{
 //	float4 worldPos: POSITION;
