@@ -14,12 +14,14 @@ public:
 	float getStrength() { return strength; };
 	void waterErode();
 	bool getisEroding() { return beingEroded; };
+	void isHill();
+	bool getHill() { return hill; };
 private:
 	float strength;
 	GameData* GD;
 	bool beingEroded;
 	bool wasEroded;
-	bool mountain;
+	bool hill;
 };
 
 #endif // !_VOXEL_H_

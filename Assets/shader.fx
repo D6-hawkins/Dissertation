@@ -55,6 +55,10 @@ PS_INPUT VS( VS_INPUT input )
 	{
 		output.Color = float4(0.0f, 0.0f, 1.0f, 1.0f);
 	}
+	else if (output.worldPos.y > 5)
+	{
+		output.Color = float4(0.7f, 1.0f, 1.0f, 1.0f);
+	}
 	else
 	{
 		output.Color = input.Color;

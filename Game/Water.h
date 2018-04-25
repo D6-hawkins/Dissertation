@@ -6,12 +6,13 @@
 #include <vector>
 #include "gridcell.h"
 #include "Terrain.h"
+#include "TerrainSculptor.h"
 class Water : public VBGO
 {
 public:
 	Water();
 	virtual ~Water() {};
-	void init(std::vector<GRIDCELL> gridVec, ID3D11Device* _GD);
+	void init(std::vector<GRIDCELL> gridVec, ID3D11Device* _GD, TerrainSculptor* _TS);
 
 	virtual void Tick(GameData* _GD) override;
 	float getErode();
@@ -20,6 +21,7 @@ public:
 	void getrandomGrid();
 	void moveGridNum();
 private:
+	TerrainSculptor* TS;
 	int counter = 0;
 	int waterPosStart;
 	std::vector<GRIDCELL> gridVec;
@@ -30,7 +32,7 @@ private:
 	float fallSpeed;
 	bool riverFormed = false;
 	int tickCounter = 0;
-	int mountainCounter = 0;
+	bool terraformOn = false;
 };
 
 #endif

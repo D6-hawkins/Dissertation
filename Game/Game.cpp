@@ -12,6 +12,7 @@
 #include "drawdata.h"
 #include "DrawData2D.h"
 #include "Terrain.h"
+#include "TerrainSculptor.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
@@ -112,9 +113,14 @@ Game::Game(ID3D11Device* _pd3dDevice, HWND _hWnd, HINSTANCE _hInstance)
 	Terr->SetScale(Vector3(3, 3, 3));
 	m_GameObjects.push_back(Terr);
 
+	TerrainSculptor* TerrSculpt = new TerrainSculptor();
+	TerrSculpt->init(Terr->getGridVec(), _pd3dDevice);
+	m_GameObjects.push_back(TerrSculpt);
+
 	Water* Wat = new Water();
-	Wat->init(Terr->getGridVec(), _pd3dDevice);
+	Wat->init(Terr->getGridVec(), _pd3dDevice, TerrSculpt);
 	m_GameObjects.push_back(Wat);
+
 };
 
 

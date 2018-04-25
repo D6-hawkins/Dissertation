@@ -6,8 +6,9 @@ Water::Water()
 	//SetPos(tempPos);
 }
 
-void Water::init(std::vector<GRIDCELL> _gridVec, ID3D11Device * GD)
+void Water::init(std::vector<GRIDCELL> _gridVec, ID3D11Device * GD, TerrainSculptor* _TS)
 {
+	TS = _TS;
 	gridVec = _gridVec;
 	getrandomGrid();
 }
@@ -23,22 +24,11 @@ void Water::Tick(GameData * _GD) //Physics will happen in tick
 			moveGridNum();
 		}
 	}
-	if (riverFormed == true)
+	if (riverFormed == true && terraformOn == false)
 	{
-		if (tickCounter != 4)
-		{
-			for (int i = 0; i < gridVec.size(); i++)
-			{
-				for (int j = 0; j < 8; j++)
-				{
-					if (gridVec[i].p[j]->getisEroding() == false)
-					{
-						gridVec[i].p[j]->Tick(_GD);
-					}
-				}
-			}
-			tickCounter++;
-		}
+		terraformOn = true;
+		TS->tagHill();
+		TS->setTicking();
 	}
 	VBGO::Tick(_GD);
 }

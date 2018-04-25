@@ -11,3 +11,4 @@
 #include "Terrain.h"
 #include "WaterManager.h"
 #include "Water.h"
+#include "TerrainSculptor.h"

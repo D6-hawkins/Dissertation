@@ -137,6 +137,7 @@
     <ClInclude Include="ObjectList.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainSculptor.h" />
     <ClInclude Include="TPSCamera.h" />
     <ClInclude Include="VBGO.h" />
     <ClInclude Include="vertex.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TerrainSculptor.cpp" />
     <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="VBGO.cpp" />
     <ClCompile Include="Voxel.cpp" />
