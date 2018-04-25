@@ -3,7 +3,7 @@
 #include <string>
 
 //=================================================================
-//helper function to convert to odd char type used by Microsoft stuff
+//conversion function
 //=================================================================
 
 struct Helper

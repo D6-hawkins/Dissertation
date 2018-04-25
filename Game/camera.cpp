@@ -25,5 +25,4 @@ void Camera::Tick(GameData* _GD)
 
 void Camera::Draw(DrawData* _DD)
 {
-	//standard camera doesn't draw ANYTHING
 }

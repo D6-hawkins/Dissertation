@@ -7,15 +7,22 @@
 class Voxel : public VBGO
 {
 public:
+	//Constructor and deconstructor
 	Voxel(Vector3);
 	virtual ~Voxel() {};
-
+	//----------------------------
+	//Tick function
 	void Tick(GameData* _GD) override;
-	float getStrength() { return strength; };
-	void waterErode();
-	bool getisEroding() { return beingEroded; };
-	void isHill();
+	//--------------------------------
+	//Getters
 	bool getHill() { return hill; };
+	float getStrength() { return strength; };
+	bool getisEroding() { return beingEroded; };
+	//--------------------------------
+	//Used for validation in different classes
+	void waterErode();
+	void isHill();
+	//-----------------------
 private:
 	float strength;
 	GameData* GD;

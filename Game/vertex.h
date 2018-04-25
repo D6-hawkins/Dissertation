@@ -2,7 +2,7 @@
 #define _VERTEX_H_
 
 //=================================================================
-// default Vertex Structure used by the VBGO render system
+// Basic vertex that is used by each vertice to specify the layout that the information needs to be passed to each vertex
 //=================================================================
 
 #include <d3d11_1.h>

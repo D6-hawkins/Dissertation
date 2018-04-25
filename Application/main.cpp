@@ -8,24 +8,10 @@
 
 
 //--------------------------------------------------------------------------------------
-// Entry point to the program. Initializes everything and goes into a message processing 
-// loop. Idle time is used to render the scene.
+// Creates the window and opens the game code
 //--------------------------------------------------------------------------------------
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
-
-#ifdef DEBUG
-	//add a Debug Console to which cout is directed whilst in DEBUG
-	if (AllocConsole()) {
-		freopen("CONOUT$", "w", stdout);
-		SetConsoleTitle(L"Debug Console");
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED);
-	}
-#endif
-
-	UNREFERENCED_PARAMETER(hPrevInstance);
-	UNREFERENCED_PARAMETER(lpCmdLine);
-
 	Application App;
 	Game* myGame = nullptr;
 
@@ -50,13 +36,13 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		else
 		{
 
-			if (App.Update()) //update next logical tick of the App
+			if (App.Update()) //update next tick
 			{
 				App.Render();
 			}
 			else
 			{
-				break; //if App sends back an exit single quit program
+				break; //exits if exit message is recieved
 			}
 		}
 	}

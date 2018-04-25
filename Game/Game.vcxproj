@@ -123,7 +123,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
-    <ClInclude Include="CMOGO.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DrawData2D.h" />
     <ClInclude Include="DrawData.h" />
@@ -135,30 +134,23 @@
     <ClInclude Include="Helper.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="ObjectList.h" />
-    <ClInclude Include="Player.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TerrainSculptor.h" />
-    <ClInclude Include="TPSCamera.h" />
     <ClInclude Include="VBGO.h" />
     <ClInclude Include="vertex.h" />
     <ClInclude Include="Voxel.h" />
     <ClInclude Include="Water.h" />
-    <ClInclude Include="WaterManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="CMOGO.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="gameobject.cpp" />
     <ClCompile Include="light.cpp" />
-    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TerrainSculptor.cpp" />
-    <ClCompile Include="TPSCamera.cpp" />
     <ClCompile Include="VBGO.cpp" />
     <ClCompile Include="Voxel.cpp" />
     <ClCompile Include="Water.cpp" />
-    <ClCompile Include="WaterManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="terrainShader.fx">

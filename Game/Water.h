@@ -10,16 +10,27 @@
 class Water : public VBGO
 {
 public:
+	//Constructor and deconstructor
 	Water();
 	virtual ~Water() {};
+	//----------------------------
+	//Init function
 	void init(std::vector<GRIDCELL> gridVec, ID3D11Device* _GD, TerrainSculptor* _TS);
-
+	//-----------------------------
+	//Tick
 	virtual void Tick(GameData* _GD) override;
-	float getErode();
-	void setGrounded(bool val) { grounded = val; };
+	//-----------------------------
+	//Getters
 	bool isGrounded() { return grounded; };
+	float getErode();
+	//-----------------------------
+	//Setters
+	void setGrounded(bool val) { grounded = val; };
+	//-----------------------------
+	//Used to create the river
 	void getrandomGrid();
 	void moveGridNum();
+	//------------------
 private:
 	TerrainSculptor* TS;
 	int counter = 0;

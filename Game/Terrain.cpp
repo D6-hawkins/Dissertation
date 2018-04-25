@@ -6,14 +6,6 @@ struct gridHolder {
 	std::vector<GRIDCELL> grid;
 };
 //Marching Cube Algorithm: http://paulbourke.net/geometry/polygonise/
-//typedef Vector3 XYZ;
-//typedef struct {
-//	XYZ p[3];
-//} TRIANGLE;
-//typedef struct {
-//	XYZ p[8];
-//	double val[8];
-//} GRIDCELL;
 /*
 Linearly interpolate the position where an isosurface cuts
 an edge between two vertices, each with their own scalar value
@@ -414,47 +406,27 @@ int Polygonise(GRIDCELL grid, double isolevel, TRIANGLE *triangles)
 
 Vector3 corners[8]
 = {
-	{ 0,0,1 },{ 1,0,1 },{ 1,0,0 },{ 0,0,0 },{ 0,1,1 },{ 1,1,1 },{ 1,1,0 },{ 0,1,0 }
+	{ 0,0,1 },{ 1,0,1 },{ 1,0,0 },{ 0,0,0 },{ 0,1,1 },{ 1,1,1 },{ 1,1,0 },{ 0,1,0 } //Defines the vertex positions of each corner to build the cube - doesn't work without this
 };
-void Terrain::Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device * _GD)
+void Terrain::Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device * _GD) //First Init to assign scale and size
 {
-	SetPhysicsOn(true);
 	Vector3 origin = _min;
 	Vector3 scale = (_max - _min) / _size;
 	Init(_isolevel,origin,_size , scale,_GD);
 	dev = _GD;
 }
-void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device * _GD)
+void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device * _GD) //used to generate the terrain
 {
 	m_origin = _origin;
 	m_scale = _scale;
-	m_size = _size;
 	m_numPrims = 0;
 	m_isolevel = isolevel;
 	_GDStore = _GD;
-	//for (int i = 0; i < gridVec.size(); i++)
-	//{
-	//	gridVec[i] = GRIDCELL*;
-	//}
-	std::thread m(&Terrain::terrainBuilder, this, _origin, _size, _scale);
+	std::thread m(&Terrain::terrainBuilder, this, _origin, _size, _scale); //Calls terrainBuilder to build the initial flat plane
 	m.join();
-
-	for (int i = 0; i < gridVec.size(); i++)
-	{
-		int newTris = Polygonise(gridVec[i], m_isolevel, &m_Triangles[0]);
-		m_numPrims += newTris;
-		for (int Counter = 0; Counter < newTris; Counter++)
-		{
-			for (int m = 0; m < 3; m++)
-			{
-				myVertex newVert;
-				newVert.Pos = m_Triangles[Counter].p[m];
-				m_vertices.push_back(newVert);				//m_vertices is 1/3rd the size of gridVec -- need to either fix this or move functionality to myVertex - not sure which would be better, probably making sure everything in gridvec is put into m_vertices
-			}
-		}
-	}
+	//This knits the vertices together so they can be moved without causing gaps
 	meshThreadGen();
-	m_vertices.clear();
+	//Runs all the contents of GridVec through the marching cubes algorithm to create the vertices
 	m_numPrims = 0;
 	for (int i = 0; i < gridVec.size(); i++)
 	{
@@ -470,9 +442,10 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 			}
 		}
 	}
+	//--------------------------
 	int numVerts = m_numPrims * 3;
 
-	////calculate the normals for the basic lighting in the base shader
+	////calculate the normals for the basic lighting
 	for (unsigned int i = 0; i < m_numPrims; i++)
 	{
 		int V1 = 3 * i;
@@ -490,7 +463,6 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 		m_vertices[V2].Norm = norm;
 		m_vertices[V3].Norm = norm;
 	}
-	//std::vector<int> indices(numVerts);
 	indices = new int[numVerts];
 	//as using the standard VB shader set the tex-coords somewhere safe
 	for (int i = 0; i < numVerts; i++)
@@ -500,7 +472,7 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 		m_vertices[i].texCoord = Vector2::One;
 		m_vertices[i].Color = Color(1.0, 1.0, 1.0, 1.0);
 	}
-	VBGO::BuildIB(_GD, indices);
+	VBGO::BuildIB(_GD, indices); //Build the Index Buffer
 
 	//structures from creating buffers
 	D3D11_BUFFER_DESC bd;
@@ -516,10 +488,8 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	InitData.pSysMem = indices;
 	hr = _GD->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
 	m_IndexFormat = DXGI_FORMAT_R32_UINT;
-	//if (numVerts != 0)
+	//Build the Vertex Buffer
 	VBGO::BuildVB(_GD, numVerts, &m_vertices[0]);
-	VBGO::m_numPrims = numVerts;
-	VBGO::BuildSB(_GD, m_numPrims, &m_vertices[0]);
 	//Rasterizer
 	D3D11_RASTERIZER_DESC raster;
 	raster.AntialiasedLineEnable = false;
@@ -533,19 +503,19 @@ void Terrain::Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scal
 	raster.ScissorEnable = false;
 	raster.SlopeScaledDepthBias = 0.0f;
 
-	// Create the rasterizer state from the description we just filled out.
+	// Create the rasterizer state
 	hr = _GD->CreateRasterizerState(&raster, &m_pRasterState);
 
-	//use the 2 sided version
+	
 	ID3DBlob* pPixelShaderBuffer = NULL;
 	hr = CompileShaderFromFile(L"../Assets/shader.fx", "PS2", "ps_4_0_level_9_1", &pPixelShaderBuffer);
 	_GD->CreatePixelShader(pPixelShaderBuffer->GetBufferPointer(), pPixelShaderBuffer->GetBufferSize(), NULL, &m_pPixelShader);
-	//t.join();
 }
 
 
 void Terrain::Tick(GameData * _GD)
 {
+	//redo the vertices to show the changes in positions in the grid vector
 	m_numPrims = 0;
 	m_vertices.clear();
 	for (int i = 0; i < gridVec.size(); i++)
@@ -562,6 +532,7 @@ void Terrain::Tick(GameData * _GD)
 			}
 		}
 	}
+	//------------------------
 	int numVerts = m_numPrims * 3;
 	for (unsigned int i = 0; i<m_numPrims; i++)
 	{
@@ -580,6 +551,7 @@ void Terrain::Tick(GameData * _GD)
 		m_vertices[V2].Norm = norm;
 		m_vertices[V3].Norm = norm;
 	}
+	//Rebuild normals
 	int* indices = new int[numVerts];
 	//as using the standard VB shader set the tex-coords somewhere safe
 	for (int i = 0; i<numVerts; i++)
@@ -588,54 +560,16 @@ void Terrain::Tick(GameData * _GD)
 		m_vertices[i].texCoord = Vector2::One;
 		m_vertices[i].Color = Color(0.0, 1.0, 1.0, 1.0);
 	}
-	//BuildIB(dev, indices);
-	////Buffer creation is shared with Init function
-	//bd.ByteWidth = sizeof(int) * 3 * m_numPrims;
-	//InitData.pSysMem = indices;
-	//hr = dev->CreateBuffer(&bd, &InitData, &m_IndexBuffer);
-
-	//m_IndexFormat = DXGI_FORMAT_R32_UINT;
-	//if (numVerts != 0)
-	//BuildVB(dev, numVerts, &m_vertices[0]);
-	//initial tick to move positions
-	/*if (counter != 300)
-	{
-		for (int i = 0; i < gridVec.size(); i++)
-		{
-			for (int r = 0; r < 8; r++)
-			{
-				gridVec[i].p[r]->Tick(_GD);
-			}
-		}
-		counter++;
-	}*/
-	/*else
-	{
-		for (int i = 0; i < gridVec.size(); i++)
-		{
-			for (int r = 0; r < 8; r++)
-			{
-				if (gridVec[i].p[r]->getisEroding() == true)
-					gridVec[i].p[r]->Tick(_GD);
-			}
-		}
-	}*/
-
 	VBGO::Tick(_GD);
 }
 void Terrain::Draw(DrawData * _DD)
 {
-	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, indices, 0, 0);
-	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0);
+	_DD->m_pd3dImmediateContext->UpdateSubresource(m_IndexBuffer, 0, NULL, indices, 0, 0); //Updates the Index buffer with the newly made contents
+	_DD->m_pd3dImmediateContext->UpdateSubresource(m_VertexBuffer, 0, NULL, &m_vertices[0], 0, 0); //Updates the Vertex buffer with the newly made contents
 	VBGO::Draw(_DD);
 }
-
-void Terrain::Remake()
-{
-
-}
-void Terrain::seamlessMesh(int startNum, int EndNum)
-{
+void Terrain::seamlessMesh(int startNum, int EndNum) //This function makes the terrain into 6 strips, from the six threads it's passed to.
+{	//startNum and EndNum is passed through, limiting the locations that the threads validate through so no Mutex is needed
 	for (int VecCounter = startNum; VecCounter < EndNum; VecCounter++)
 	{
 		if (gridVec[VecCounter].failed != true)
@@ -647,7 +581,7 @@ void Terrain::seamlessMesh(int startNum, int EndNum)
 					for (int GridElemB = 0; GridElemB < gridVec[VecCounter].size; GridElemB++)
 					{
 						if (VecCounter != VecCounterB)
-							if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos())
+							if (gridVec[VecCounter].p[GridElem]->GetPos() == gridVec[VecCounterB].p[GridElemB]->GetPos()) //If any positions of each vertex it validates match, set them to be the same so when one is moved, the other is too
 							{
 								gridVec[VecCounter].p[GridElem] = gridVec[VecCounterB].p[GridElemB];
 								gridVec[VecCounter].val[GridElem] = gridVec[VecCounterB].val[GridElemB];
@@ -659,7 +593,7 @@ void Terrain::seamlessMesh(int startNum, int EndNum)
 	}
 }
 
-void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
+void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale) //Builds the initial flat plane of the terrain
 {
 	for (int XCounter = 0; XCounter < _size.x; XCounter++)
 	{
@@ -670,17 +604,15 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 				GRIDCELL m_Grid;
 				for (int i = 0; i < 8; i++)
 				{
-					//m.lock();
 					m_Grid.p[i] = new Voxel(Vector3(XCounter, YCounter, ZCounter) + corners[i] * _scale + m_origin);
 
 					m_Grid.val[i] = PosChanger(m_Grid.p[i]->GetPos(), i);
 
 					m_Grid.size = 7;
-					//m.unlock();
 				}
 				gridVec.push_back(m_Grid);
 				int newTris = Polygonise(m_Grid, m_isolevel, &m_Triangles[0]);
-				if (newTris == 0)
+				if (newTris == 0) //Uses the marching cubes polygonise to find if the  grid vector will be rendered and if it won't be, remove it
 				{
 					gridVec.pop_back();
 				}
@@ -689,8 +621,9 @@ void Terrain::terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale)
 	}
 }
 
-void Terrain::gapFiller(std::vector<int> gapVec, int num)
-{
+void Terrain::gapFiller(std::vector<int> gapVec, int num) //Fills the gaps from the SeamlessMesh() function
+{ //This function is threads so uses a similar approach to the SeamlessMesh() function.
+  //Validates the vertices before and after each thread to stitch the remaining vertices together
 		int gapChecker = gapVec[num];
 		int calcNum = 60;
 		for (int VecCounter = gapChecker- calcNum; VecCounter < gapChecker+ calcNum; VecCounter++)
@@ -715,41 +648,51 @@ void Terrain::gapFiller(std::vector<int> gapVec, int num)
 		}
 }
 
-void Terrain::meshThreadGen()
+void Terrain::meshThreadGen() //This function creates the threads that connect the vertices together.
 {
 	div_t divresult;
 	numOfThreads = 6;
-	divresult = div(gridVec.size(), numOfThreads);
+	divresult = div(gridVec.size(), numOfThreads); //calculates the amount of vertices each thread will be validating
 	startVal = divresult.quot;
 	startValRem = divresult.quot + divresult.rem;
 	int calc = startValRem - startVal;
+	//Pushes back the end values
 	gaps.push_back(startVal);
 	gaps.push_back(startVal * 2);
 	gaps.push_back(startVal * 3);
 	gaps.push_back(startVal * 4);
 	gaps.push_back(startVal * 5);
+	//--------------------------
+	//Creates the threads
 	std::thread grid1(&Terrain::seamlessMesh, this, 0, startVal);
 	std::thread grid2(&Terrain::seamlessMesh, this, startVal+1, startVal*2);
 	std::thread grid3(&Terrain::seamlessMesh, this, startVal * 2 +1, startVal*3);
 	std::thread grid4(&Terrain::seamlessMesh, this, startVal*3 + 1, startVal*4);
 	std::thread grid5(&Terrain::seamlessMesh, this, startVal * 4 + 1, startVal * 5);
 	std::thread grid6(&Terrain::seamlessMesh, this, startVal * 5 + 1, gridVec.size());
+	//-------------------------------
+	//Waits for them to finish computing - needs to be done to avoid data races in the next set of threads
 	grid1.join();
 	grid2.join();
 	grid3.join();
 	grid4.join();
 	grid5.join();
 	grid6.join();
+	//--------------------------------- 
+	//creates the next set of threads
 	std::thread filler1(&Terrain::gapFiller, this, gaps, 0);
 	std::thread filler2(&Terrain::gapFiller, this, gaps, 1);
 	std::thread filler3(&Terrain::gapFiller, this, gaps, 2);
 	std::thread filler4(&Terrain::gapFiller, this, gaps, 3);
 	std::thread filler5(&Terrain::gapFiller, this, gaps, 4);
+	//---------------------------------
+	//joins the second set so all the grid members are connected before the vertices are created
 	filler1.join();
 	filler2.join();
 	filler3.join();
 	filler4.join();
 	filler5.join();
+	//----------------------------------
 }
 
 float Terrain::PosChanger(Vector3 _pos, int i)

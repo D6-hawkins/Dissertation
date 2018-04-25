@@ -10,7 +10,7 @@
 #include <SDKDDKVer.h>
 
 //=================================================================
-// All Application and DirectX base level stuff goes here
+// H File for the creation of the application window
 //=================================================================
 
 using namespace DirectX;
@@ -23,10 +23,10 @@ public:
 	Application () {};
 	~Application() { CleanupDevice(); };
 
-	//init the Windows window and the game
+	//init the Window
 	HRESULT InitWindow(HINSTANCE _hInstance, int _nCmdShow);
 
-	//init and tidy up after use DirectX resources
+	//Creation and destruction of device
 	HRESULT InitDevice();
 	void CleanupDevice(); //also deletes current game
 

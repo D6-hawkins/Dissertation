@@ -1,7 +1,6 @@
 //--------------------------------------------------------------------------------------
-// A basic shader with colour and texture fetch and a simple light
+// Vertex and Pixel shader, used to set the colours of the vertices as they move position
 //--------------------------------------------------------------------------------------
-//#include "gridcell.h"
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -80,7 +79,7 @@ float4 PS( PS_INPUT input) : SV_Target
 	return float4(1.0f, 0.0f, 1.0f, 1.0f);
 }
 
-//this can be used to do doubled sided rendering of an object with back culling switched off
+//Pixel shader for CULLING_NONE (the culling method used for marching cubes)
 float4 PS2(PS_INPUT input) : SV_Target
 {
 	float4 vertexCol = input.Color * myTexture.Sample(mySampler, input.texCoord);

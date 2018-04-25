@@ -3,13 +3,9 @@
 #include "VBGO.h"
 #include "gridcell.h"
 #include <vector>
-#include <fstream>
-#include <math.h>
 #include "vertex.h"
 #include "DrawData.h"
-#include <mutex>
 #include <thread>
-#include <stdlib.h>
 class Voxel;
 typedef Vector3 XYZ;
 typedef struct {
@@ -18,52 +14,46 @@ typedef struct {
 class Terrain : public VBGO
 {
 public:
+	//Constructor and deconstructor
 	Terrain() {};
 	virtual ~Terrain() {};
-
+	//-----------------------------
+	//Init functions to set the correct values and build the initial terrain
 	void Init(float isolevel, Vector3 _origin, Vector3 _size, Vector3 _scale, ID3D11Device* _GD);
 	void Init(Vector3 _min, Vector3 _max, float _isolevel, Vector3 _size, ID3D11Device* _GD);
+	//----------------------------------
+	//Tick and Draw
 	void Tick(GameData* _GD) override;
 	void Draw(DrawData* _DD) override;
-	void Remake();
-	//GRIDCELL getGrid() { return m_Grid; };
+	//--------------------------------
+	//Getters
 	std::vector<GRIDCELL> getGridVec() { return gridVec; };
-	Vector3 getScale() { return m_scale; };
-	Vector3 getSize() { return m_size; };
 	std::vector<myVertex> getvert() { return m_vertices; };
+	//---------------------------
+	//Functions used to create the terrain
 	void seamlessMesh(int startNum, int endNum);
-	//void Sorter(std::vector <GRIDCELL>);
 	void terrainBuilder(Vector3 _origin, Vector3 _size, Vector3 _scale);
-	std::vector <GRIDCELL> gridVec;
-	bool getShouldBeShader() { return ShaderCode;};
 	void gapFiller(std::vector<int> gapVec, int);
 	void meshThreadGen();
+	//-------------------------------------
 protected:
-	bool ShaderCode = true;
+	std::vector <GRIDCELL> gridVec; //Vector that holds all grid locations
 	int numOfThreads;
-	std::vector<int> gaps;
+	std::vector<int> gaps; //Holds all last grid sections that were created, these would not have been connected correctly
 	float m_isolevel;
 	TRIANGLE m_Triangles[5];
-	std::vector<myVertex> m_vertices;
-	float PosChanger(Vector3 _pos, int i);
+	std::vector<myVertex> m_vertices; //Holds the vertices
+	float PosChanger(Vector3 _pos, int i); //Used to return a value used in the marching cubes algorithm
 	Vector3 m_origin;
-	Vector3 m_scale;
-	Vector3 m_size;
 	ID3D11Device* dev;
-	std::vector <Voxel*> holderVec;
-	int testCount = 0;
 	D3D11_BUFFER_DESC bd;
 	D3D11_SUBRESOURCE_DATA InitData;
 	HRESULT hr = S_OK;
 	int counter = 0;
-	std::mutex m;
 	ID3D11Device* _GDStore;
 	int* indices;
 	int startVal;
 	int startValRem;
-	//int* indices;
-	//std::thread t;
-	//std::thread m;
 };
 
 #endif

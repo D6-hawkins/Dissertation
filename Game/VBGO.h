@@ -29,9 +29,9 @@ protected:
 	//Direct X information for the model for this GameObject
 	ID3D11Buffer* m_VertexBuffer;
 	ID3D11Buffer* m_IndexBuffer;
-	ID3D11Buffer* m_StreamBuffer;
-	ID3D11Buffer* m_OutputBuffer;
 	//ID3D11Buffer* m_StreamBuffer;
+	//ID3D11Buffer* m_OutputBuffer;
+	////ID3D11Buffer* m_StreamBuffer;
 	DXGI_FORMAT m_IndexFormat = DXGI_FORMAT_R16_UINT;
 	UINT m_numPrims;
 

@@ -2,8 +2,6 @@
 
 Water::Water()
 {
-	//Vector3 tempPos = Vector3(0.0f, 60.0f, 0.0f);
-	//SetPos(tempPos);
 }
 
 void Water::init(std::vector<GRIDCELL> _gridVec, ID3D11Device * GD, TerrainSculptor* _TS)
@@ -13,18 +11,17 @@ void Water::init(std::vector<GRIDCELL> _gridVec, ID3D11Device * GD, TerrainSculp
 	getrandomGrid();
 }
 
-void Water::Tick(GameData * _GD) //Physics will happen in tick
+void Water::Tick(GameData * _GD) //Erosion is calculated during tick
 {
-	//waterPosStart = rand() % gridVec.size() + 0;
 	for (int i = 0; i < 8; i++)
 	{
 		gridVec[waterPosStart].p[i]->waterErode();
-		if (gridVec[waterPosStart].p[i]->getStrength() <= 0)
+		if (gridVec[waterPosStart].p[i]->getStrength() <= 0) //If the current section is no longer being eroded
 		{
-			moveGridNum();
+			moveGridNum(); //Select new section
 		}
 	}
-	if (riverFormed == true && terraformOn == false)
+	if (riverFormed == true && terraformOn == false) //If the river has finished being formed
 	{
 		terraformOn = true;
 		TS->tagHill();
@@ -50,24 +47,16 @@ void Water::getrandomGrid()
 	}
 }
 
-void Water::moveGridNum()
+void Water::moveGridNum() //Decided which way the river will move
 {
 	int randNum = rand() % 3 + 1;
 	if (waterPosStart != gridVec.size()-1)
 	{
-		////if (randNum == 1) //MOVE FORWARD
-		////{
-		////	if (gridVec[waterPosStart].p[1]->GetPos().x == (gridVec[waterPosStart + 1].p[1]->GetPos().x))
-		////	{
-		////		waterPosStart++;
-		////	}
-		////}
 		bool loopBool = true;
-		if (counter == 2)
+		if (counter == 1)
 		{
 			if (randNum == 2) //MOVE LEFT
 			{
-				//FIND WHICHEVER GRID IS ONE DOWN AND ONE LEFT //PROBABLY A BIG LOOP
 				for (int j = 0; j < gridVec.size() && loopBool == true; j++)
 				{
 					if (gridVec[j].p[1]->GetPos().x == gridVec[waterPosStart].p[1]->GetPos().x - 1)
@@ -110,7 +99,6 @@ void Water::moveGridNum()
 			{
 				counter = 0;
 				riverFormed = true;
-				//call mountainmakerorsomething
 			}
 		}
 	}

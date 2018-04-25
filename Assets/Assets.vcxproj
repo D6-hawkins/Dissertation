@@ -146,9 +146,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="italic.spritefont" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="shader.fx">
       <FileType>Document</FileType>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
@@ -156,22 +153,6 @@
   </ItemGroup>
   <ItemGroup>
     <MeshContentTask Include="Bird\BirdModelV1.fbx" />
-    <MeshContentTask Include="Table\table.FBX" />
-    <MeshContentTask Include="Vase\JEMINA vase -up.fbx" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="baseline.txt" />
-    <Text Include="cube.txt" />
-    <Text Include="terrainTex.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ImageContentTask Include="grass.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ImageContentTask Include="white.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ImageContentTask Include="logo_small.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
